@@ -1,8 +1,26 @@
 import axios from 'axios';
 
-const API_URL = typeof window !== 'undefined'
-  ? `http://${window.location.hostname}:5000/api/v1`
-  : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1');
+const getBaseUrl = (): string => {
+  // 1. If configured via environment variable (Vercel / Production), always use it
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  // 2. Client-side local dev fallback
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (
+      host === 'localhost' ||
+      host === '127.0.0.1' ||
+      host.startsWith('192.168.') ||
+      host.startsWith('10.')
+    ) {
+      return `http://${host}:5000/api/v1`;
+    }
+  }
+  return 'http://localhost:5000/api/v1';
+};
+
+const API_URL = getBaseUrl();
 
 export const apiClient = axios.create({
   baseURL: API_URL,
