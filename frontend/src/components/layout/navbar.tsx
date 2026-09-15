@@ -172,7 +172,7 @@ export function Navbar() {
               {/* Auth */}
               {isAuthenticated && user ? (
                 <div className="relative group">
-                  <button className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-gray-100 transition-all">
+                  <button className="flex items-center gap-1.5 p-1.5 md:px-3 md:py-1.5 rounded-xl hover:bg-gray-100 transition-all">
                     <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white text-sm font-bold">
                       {user.firstName[0]}
                     </div>
@@ -197,8 +197,13 @@ export function Navbar() {
                   </div>
                 </div>
               ) : (
-                <Link href="/login" className="hidden md:flex items-center gap-2 px-4 py-2 rounded-md bg-black text-white text-sm font-medium hover:bg-gray-800 transition-all">
-                  <User className="h-4 w-4" /> Sign In
+                <Link
+                  href="/login"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black text-white text-xs md:text-sm font-medium hover:bg-gray-800 transition-all"
+                  aria-label="Sign In"
+                >
+                  <User className="h-4 w-4" />
+                  <span>Sign In</span>
                 </Link>
               )}
 
@@ -206,6 +211,7 @@ export function Navbar() {
               <button
                 className="lg:hidden p-2.5 rounded-xl text-gray-600 hover:bg-gray-50"
                 onClick={() => setIsMobileOpen(!isMobileOpen)}
+                aria-label="Open menu"
               >
                 {isMobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </button>
@@ -220,9 +226,79 @@ export function Navbar() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden border-t border-gray-100 bg-white overflow-hidden"
+              className="lg:hidden border-t border-gray-100 bg-white overflow-hidden shadow-xl"
             >
-              <div className="container mx-auto px-4 py-4 space-y-2">
+              <div className="container mx-auto px-4 py-4 space-y-3">
+                {/* Auth section at top of mobile menu */}
+                {isAuthenticated && user ? (
+                  <div className="p-3 bg-gray-50 rounded-xl space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold text-sm">
+                          {user.firstName[0]}
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900 leading-tight">
+                            {user.firstName} {user.lastName || ''}
+                          </p>
+                          <p className="text-xs text-gray-500 leading-tight">{user.email}</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          setIsMobileOpen(false);
+                        }}
+                        className="p-1.5 text-xs text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-1"
+                      >
+                        <LogOut className="h-3.5 w-3.5" /> Sign Out
+                      </button>
+                    </div>
+                    <div className="flex gap-2 pt-1 border-t border-gray-200">
+                      {user.role !== 'CUSTOMER' && (
+                        <Link
+                          href="/admin"
+                          className="flex-1 py-1.5 text-center text-xs bg-black text-white rounded-lg font-medium"
+                          onClick={() => setIsMobileOpen(false)}
+                        >
+                          Admin
+                        </Link>
+                      )}
+                      <Link
+                        href="/profile"
+                        className="flex-1 py-1.5 text-center text-xs bg-white border border-gray-200 text-gray-700 rounded-lg font-medium"
+                        onClick={() => setIsMobileOpen(false)}
+                      >
+                        Profile
+                      </Link>
+                      <Link
+                        href="/orders"
+                        className="flex-1 py-1.5 text-center text-xs bg-white border border-gray-200 text-gray-700 rounded-lg font-medium"
+                        onClick={() => setIsMobileOpen(false)}
+                      >
+                        Orders
+                      </Link>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2 pb-2 border-b border-gray-100">
+                    <Link
+                      href="/login"
+                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 bg-black text-white text-sm font-medium rounded-xl text-center shadow-sm"
+                      onClick={() => setIsMobileOpen(false)}
+                    >
+                      <User className="h-4 w-4" /> Sign In
+                    </Link>
+                    <Link
+                      href="/register"
+                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 border border-gray-300 text-gray-800 text-sm font-medium rounded-xl text-center hover:bg-gray-50"
+                      onClick={() => setIsMobileOpen(false)}
+                    >
+                      Register
+                    </Link>
+                  </div>
+                )}
+
                 {categories.map((cat) => (
                   <div key={cat.slug}>
                     <Link
@@ -248,11 +324,6 @@ export function Navbar() {
                     )}
                   </div>
                 ))}
-                {!isAuthenticated && (
-                  <Link href="/login" className="block px-4 py-2.5 text-sm font-medium text-black border border-gray-200 rounded-xl text-center" onClick={() => setIsMobileOpen(false)}>
-                    Sign In
-                  </Link>
-                )}
               </div>
             </motion.div>
           )}
