@@ -29,17 +29,22 @@ You can deploy the backend using the Render Web Dashboard or the automated Bluep
 2. Connect your GitHub repository: `https://github.com/ubedkhatri3305-byte/KDA`.
 3. Configure service settings:
    - **Name**: `kda-backend` (or your preferred name)
-   - **Region**: Choose the closest region to your database (e.g., Oregon or Frankfurt)
+   - **Region**: Choose the closest region to your database
    - **Branch**: `main`
-   - **Root Directory**: `backend` *(CRITICAL: must be set to `backend`)*
+   - **Root Directory**: `backend`
    - **Runtime**: `Node`
-   - **Build Command**: `npm install && npx prisma generate && npm run build`
+   - **Build Command**: `npm install && npm run build`
    - **Start Command**: `npm run start:prod`
    - **Instance Type**: `Free` or `Starter`
 4. Under **Advanced** settings:
    - **Health Check Path**: `/health`
    - **Auto-Deploy**: `Yes`
 5. Add the **Environment Variables** listed below, then click **Create Web Service**.
+
+> [!TIP]
+> If you leave **Root Directory** blank/empty in Render, use:
+> - **Build Command**: `npm run build`
+> - **Start Command**: `npm run start:prod`
 
 ### Option B: Render Blueprint (`render.yaml`)
 1. In Render Dashboard, click **New +** → **Blueprint**.
