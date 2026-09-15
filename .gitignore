@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build Outputs
+dist/
+build/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# Environment & Secrets (NEVER COMMIT SENSITIVE KEYS)
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Database & Neon
+.neon
+.neon/
+/generated/prisma
+
+# Antigravity IDE & Skills
+.agents/
+skills-lock.json
+
+# IDE & OS Files
+.DS_Store
+.vscode/
+.idea/
+Thumbs.db
+*.pem
+
+# Agent & AI debug caches
+roles_debug.log
