@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, ShoppingBag, Heart, User, Menu, X, Bell, ChevronDown,
-  Sparkles, LogOut, Package, Settings, ChevronRight,
+  Sparkles, LogOut, Package, Settings, ChevronRight, Home,
 } from 'lucide-react';
 import { useCartStore } from '@/store/cart.store';
 import { useAuthStore } from '@/store/auth.store';
@@ -28,6 +28,7 @@ const categories: CategoryItem[] = [
 ];
 
 export function Navbar() {
+  const [mounted, setMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -44,6 +45,7 @@ export function Navbar() {
   const wishlistCount = wishlistItems.length;
 
   useEffect(() => {
+    setMounted(true);
     const handler = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handler, { passive: true });
     return () => window.removeEventListener('scroll', handler);
@@ -369,6 +371,51 @@ export function Navbar() {
 
       {/* Spacer for fixed navbar */}
       <div className="h-16" />
+
+      {/* Mobile Bottom Sticky Navigation - 100% Guaranteed Visibility on Phone */}
+      <nav
+        aria-label="Mobile Bottom Navigation"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-gray-200 py-1.5 px-3 flex justify-around items-center shadow-[0_-4px_16px_rgba(0,0,0,0.08)]"
+      >
+        <Link href="/" className="flex flex-col items-center gap-0.5 text-gray-700 hover:text-black min-w-[48px] py-1">
+          <Home className="h-5 w-5" />
+          <span className="text-[10px] font-semibold">Home</span>
+        </Link>
+        <button onClick={() => setSearchOpen(true)} className="flex flex-col items-center gap-0.5 text-gray-700 hover:text-black min-w-[48px] py-1">
+          <Search className="h-5 w-5" />
+          <span className="text-[10px] font-semibold">Search</span>
+        </button>
+        <Link href="/wishlist" className="relative flex flex-col items-center gap-0.5 text-gray-700 hover:text-black min-w-[48px] py-1">
+          <Heart className="h-5 w-5" />
+          {wishlistCount > 0 && (
+            <span className="absolute top-0 right-2 bg-black text-white text-[9px] rounded-full w-3.5 h-3.5 flex items-center justify-center font-bold">
+              {wishlistCount}
+            </span>
+          )}
+          <span className="text-[10px] font-semibold">Wishlist</span>
+        </Link>
+        <button onClick={openCart} className="relative flex flex-col items-center gap-0.5 text-gray-700 hover:text-black min-w-[48px] py-1">
+          <ShoppingBag className="h-5 w-5" />
+          {cartCount > 0 && (
+            <span className="absolute top-0 right-2 bg-black text-white text-[9px] rounded-full w-3.5 h-3.5 flex items-center justify-center font-bold">
+              {cartCount}
+            </span>
+          )}
+          <span className="text-[10px] font-semibold">Cart</span>
+        </button>
+        <Link
+          href={mounted && isAuthenticated ? "/profile" : "/login"}
+          className="flex flex-col items-center gap-0.5 text-black hover:text-gray-700 min-w-[56px] py-1 bg-black text-white rounded-xl px-3 shadow-sm"
+        >
+          <User className="h-4 w-4 text-white" />
+          <span className="text-[10px] font-bold text-white">
+            {mounted && isAuthenticated ? 'Account' : 'Sign In'}
+          </span>
+        </Link>
+      </nav>
+
+      {/* Spacer for bottom bar on mobile */}
+      <div className="lg:hidden h-14" />
     </>
   );
 }
