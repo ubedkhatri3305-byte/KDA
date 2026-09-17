@@ -65,22 +65,22 @@ export default function AdminProductsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Link href="/admin" className="p-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <Link href="/admin" className="p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors shrink-0">
               <ArrowLeft className="h-4 w-4" />
             </Link>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Product Management</h1>
-              <p className="text-gray-500 text-sm">Manage your catalog, inventory, and pricing.</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Product Management</h1>
+              <p className="text-gray-500 text-xs sm:text-sm">Manage your catalog, inventory, and pricing.</p>
             </div>
           </div>
           <Link
             href="/admin/products/new"
-            className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-md text-sm font-medium hover:bg-gray-800 transition-colors"
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors w-full sm:w-auto"
           >
             <Plus className="h-4 w-4" /> Add Product
           </Link>
@@ -88,7 +88,7 @@ export default function AdminProductsPage() {
 
         {/* Search & Actions */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="relative flex-1 max-w-md">
+          <div className="relative flex-1 max-w-md w-full">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-4 w-4 text-gray-400" />
             </div>
@@ -97,37 +97,37 @@ export default function AdminProductsPage() {
               placeholder="Search products..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 pr-4 py-2 w-full border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-gray-300 transition-colors"
+              className="pl-10 pr-4 py-2 w-full border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-gray-300 transition-colors"
             />
           </div>
         </div>
 
         {/* Stats */}
         {!isLoading && products.length > 0 && !debouncedSearch && (
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="bg-white rounded-lg border border-gray-200 px-5 py-4">
-              <p className="text-sm text-gray-500">Total Products</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{products.length}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
+            <div className="bg-white rounded-xl border border-gray-200 p-4 sm:px-5 sm:py-4 shadow-sm">
+              <p className="text-xs sm:text-sm text-gray-500">Total Products</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">{products.length}</p>
             </div>
-            <div className="bg-white rounded-lg border border-gray-200 px-5 py-4">
-              <p className="text-sm text-gray-500">Visible to Customers</p>
-              <p className="text-2xl font-bold text-green-600 mt-1">{products.filter((p: any) => p.isActive).length}</p>
+            <div className="bg-white rounded-xl border border-gray-200 p-4 sm:px-5 sm:py-4 shadow-sm">
+              <p className="text-xs sm:text-sm text-gray-500">Visible to Customers</p>
+              <p className="text-xl sm:text-2xl font-bold text-green-600 mt-1">{products.filter((p: any) => p.isActive).length}</p>
             </div>
-            <div className="bg-white rounded-lg border border-gray-200 px-5 py-4">
-              <p className="text-sm text-gray-500">Hidden</p>
-              <p className="text-2xl font-bold text-gray-400 mt-1">{products.filter((p: any) => !p.isActive).length}</p>
+            <div className="bg-white rounded-xl border border-gray-200 p-4 sm:px-5 sm:py-4 shadow-sm">
+              <p className="text-xs sm:text-sm text-gray-500">Hidden</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-400 mt-1">{products.filter((p: any) => !p.isActive).length}</p>
             </div>
           </div>
         )}
 
         {/* Table */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           {isLoading ? (
             <div className="p-12 flex justify-center">
               <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
             </div>
           ) : products.length === 0 ? (
-            <div className="p-16 text-center">
+            <div className="p-12 sm:p-16 text-center">
               <Package className="h-12 w-12 text-gray-300 mx-auto mb-3" />
               <p className="text-gray-500 font-medium">No products found</p>
               <p className="text-gray-400 text-sm mt-1">
@@ -136,7 +136,7 @@ export default function AdminProductsPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
+              <table className="w-full text-sm text-left min-w-[680px]">
                 <thead className="bg-gray-50 text-gray-600 font-medium border-b border-gray-200">
                   <tr>
                     <th className="px-6 py-4">Product</th>

@@ -9,7 +9,7 @@ import {
   LayoutDashboard, Package, ShoppingBag, Users, Tag, BarChart3, Settings,
   Sparkles, Bell, Search, TrendingUp, ArrowUpRight, ArrowDownRight,
   ChevronRight, MoreHorizontal, AlertCircle, LogOut, MessageCircle,
-  Phone, RefreshCw, X, CheckCircle, Clock, Truck, XCircle, Star, Image as ImageIcon
+  Phone, RefreshCw, X, CheckCircle, Clock, Truck, XCircle, Star, Image as ImageIcon, Menu
 } from 'lucide-react';
 import { adminApi } from '@/services/api';
 import { useAuthStore } from '@/store/auth.store';
@@ -47,6 +47,7 @@ export default function AdminDashboard() {
   const queryClient = useQueryClient();
   const [activeNav, setActiveNav] = useState('/admin');
   const [selectedOrderStatus, setSelectedOrderStatus] = useState<string>('');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (user && user.role === 'CUSTOMER') {
@@ -94,13 +95,24 @@ export default function AdminDashboard() {
 
   return (
     <>
-    <div className="flex h-screen bg-gray-950 overflow-hidden">
-      {/* Sidebar */}
+    <div className="flex h-screen bg-gray-950 overflow-hidden relative">
+      {/* Mobile Drawer Backdrop */}
+      {isMobileMenuOpen && (
+        <div
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity"
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Sidebar (Drawer on mobile, fixed column on desktop) */}
       <aside
-        className="w-64 flex-shrink-0 flex flex-col border-r border-gray-200 bg-white"
+        className={`fixed inset-y-0 left-0 z-50 w-64 flex flex-col border-r border-gray-200 bg-white transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${
+          isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+        }`}
       >
-        {/* Logo */}
-        <div className="p-5 border-b border-gray-200">
+        {/* Logo & Mobile Close */}
+        <div className="p-4 sm:p-5 border-b border-gray-200 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded bg-black flex items-center justify-center">
               <Sparkles className="h-4 w-4 text-white" />
@@ -110,6 +122,13 @@ export default function AdminDashboard() {
               <div className="text-gray-500 text-xs">Admin Panel</div>
             </div>
           </Link>
+          <button
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="lg:hidden p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
+            aria-label="Close menu"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
 
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
@@ -120,7 +139,10 @@ export default function AdminDashboard() {
               className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                 activeNav === item.href ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50'
               }`}
-              onClick={() => setActiveNav(item.href)}
+              onClick={() => {
+                setActiveNav(item.href);
+                setIsMobileMenuOpen(false);
+              }}
             >
               <item.icon className="h-4 w-4 flex-shrink-0" />
               {item.label}
@@ -141,7 +163,7 @@ export default function AdminDashboard() {
           </div>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-red-400 hover:bg-red-500/10 text-xs transition-all"
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-red-500 hover:bg-red-50 text-xs font-medium transition-all"
           >
             <LogOut className="h-3.5 w-3.5" /> Sign Out
           </button>
@@ -149,52 +171,63 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto bg-gray-50">
+      <main className="flex-1 overflow-auto bg-gray-50 min-w-0">
         {/* Top Bar */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-sm text-gray-400">Welcome back, {user?.firstName}! 👋</p>
+        <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between sticky top-0 z-10 gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="lg:hidden p-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-100 focus:outline-none shrink-0"
+              aria-label="Open menu"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <div className="min-w-0">
+              <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate">Dashboard</h1>
+              <p className="text-xs text-gray-400 hidden sm:block">Welcome back, {user?.firstName}! 👋</p>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <Link
               href="/admin/customers"
-              className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-xl hover:bg-green-600 transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-green-500 text-white text-xs sm:text-sm font-medium rounded-lg sm:rounded-xl hover:bg-green-600 transition-all shadow-sm"
             >
-              <MessageCircle className="h-4 w-4" /> Customers & WhatsApp
+              <MessageCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+              <span className="hidden sm:inline">Customers & WhatsApp</span>
+              <span className="sm:hidden">WhatsApp</span>
             </Link>
-            <Link href="/" className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1">
-              ← Back to Store
+            <Link href="/" className="text-xs sm:text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 whitespace-nowrap">
+              ← <span className="hidden sm:inline">Back to Store</span><span className="sm:hidden">Store</span>
             </Link>
           </div>
         </header>
 
-        <div className="p-6 space-y-6">
+        <div className="p-3 sm:p-6 space-y-4 sm:space-y-6 max-w-full">
           {/* Stats Grid */}
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-5">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-32 rounded-2xl bg-gray-200 shimmer" />
+                <div key={i} className="h-28 sm:h-32 rounded-xl bg-gray-200 shimmer" />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-5">
               {statsCards.map((stat, i) => (
                 <motion.div
                   key={stat.label}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.08 }}
-                  className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm"
+                  className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 shadow-sm"
                 >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="p-2.5 bg-gray-50 text-gray-700 border border-gray-100 rounded-md">
-                      <stat.icon className="h-5 w-5" />
+                  <div className="flex items-start justify-between mb-2 sm:mb-3">
+                    <div className="p-2 sm:p-2.5 bg-gray-50 text-gray-700 border border-gray-100 rounded-md">
+                      <stat.icon className="h-4 w-4 sm:h-5 sm:w-5" />
                     </div>
-                    <span className="text-gray-500 text-xs">{stat.sub}</span>
+                    <span className="text-gray-500 text-[11px] sm:text-xs">{stat.sub}</span>
                   </div>
-                  <div className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
-                  <div className="text-gray-500 text-sm">{stat.label}</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-0.5 sm:mb-1">{stat.value}</div>
+                  <div className="text-gray-500 text-xs sm:text-sm">{stat.label}</div>
                 </motion.div>
               ))}
             </div>

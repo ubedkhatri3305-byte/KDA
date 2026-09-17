@@ -119,11 +119,11 @@ export default function RegisterPage() {
                 First Name
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                 <input
                   type="text"
                   {...register('firstName')}
-                  className="input-brand pl-9 text-sm"
+                  className="input-brand !pl-10 text-sm"
                   placeholder="John"
                   autoComplete="given-name"
                 />
@@ -135,11 +135,11 @@ export default function RegisterPage() {
                 Last Name
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                 <input
                   type="text"
                   {...register('lastName')}
-                  className="input-brand pl-9 text-sm"
+                  className="input-brand !pl-10 text-sm"
                   placeholder="Doe"
                   autoComplete="family-name"
                 />
@@ -154,11 +154,11 @@ export default function RegisterPage() {
               Email Address
             </label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
               <input
                 type="email"
                 {...register('email')}
-                className="input-brand pl-9 text-sm"
+                className="input-brand !pl-10 text-sm"
                 placeholder="john@example.com"
                 autoComplete="email"
               />
@@ -172,12 +172,12 @@ export default function RegisterPage() {
               Mobile Number <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <span className="absolute left-9 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium">+91</span>
+              <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+              <span className="absolute left-9 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium pointer-events-none">+91</span>
               <input
                 type="tel"
                 {...register('phone')}
-                className="input-brand pl-16 text-sm"
+                className="input-brand !pl-20 text-sm"
                 placeholder="9876543210"
                 maxLength={10}
                 autoComplete="tel"
@@ -212,12 +212,12 @@ export default function RegisterPage() {
             {!sameAsPhone && (
               <div>
                 <div className="relative">
-                  <MessageCircle className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <span className="absolute left-9 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium">+91</span>
+                  <MessageCircle className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                  <span className="absolute left-9 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium pointer-events-none">+91</span>
                   <input
                     type="tel"
                     {...register('whatsappNumber')}
-                    className="input-brand pl-16 text-sm"
+                    className="input-brand !pl-20 text-sm"
                     placeholder="WhatsApp number"
                     maxLength={10}
                   />
@@ -233,18 +233,18 @@ export default function RegisterPage() {
               Password
             </label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 {...register('password')}
-                className="input-brand pl-9 pr-10 text-sm"
+                className="input-brand !pl-10 !pr-10 text-sm"
                 placeholder="Create a strong password"
                 autoComplete="new-password"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -259,18 +259,18 @@ export default function RegisterPage() {
               Confirm Password
             </label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
               <input
                 type={showConfirm ? 'text' : 'password'}
                 {...register('confirmPassword')}
-                className="input-brand pl-9 pr-10 text-sm"
+                className="input-brand !pl-10 !pr-10 text-sm"
                 placeholder="Repeat your password"
                 autoComplete="new-password"
               />
               <button
                 type="button"
                 onClick={() => setShowConfirm(!showConfirm)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
                 aria-label={showConfirm ? 'Hide password' : 'Show password'}
               >
                 {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import {
   Users, MessageCircle, Phone, Mail, Search, ChevronLeft,
   CheckCircle, XCircle, ShoppingBag, LayoutDashboard, Package,
-  Tag, BarChart3, Sparkles, Filter,
+  Tag, BarChart3, Sparkles, Filter, Menu, X,
 } from 'lucide-react';
 import { adminApi } from '@/services/api';
 import { useAuthStore } from '@/store/auth.store';
@@ -23,11 +23,12 @@ const navItems = [
   { icon: Sparkles, label: 'AI Manager', href: '/admin/ai' },
 ];
 
-export default function AdminCustomers() {
+export default function AdminCustomersPage() {
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin', 'customers', page],
@@ -40,7 +41,7 @@ export default function AdminCustomers() {
       toast.success('Customer status updated');
       queryClient.invalidateQueries({ queryKey: ['admin', 'customers'] });
     },
-    onError: () => toast.error('Failed to update customer'),
+    onError: () => toast.error('Failed to update status'),
   });
 
   const customers: any[] = (data as any)?.data || [];
@@ -53,13 +54,24 @@ export default function AdminCustomers() {
   );
 
   return (
-    <div className="flex h-screen bg-gray-950 overflow-hidden">
+    <div className="flex h-screen bg-gray-950 overflow-hidden relative">
+      {/* Mobile Backdrop */}
+      {isMobileMenuOpen && (
+        <div
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity"
+          aria-hidden="true"
+        />
+      )}
+
       {/* Sidebar */}
       <aside
-        className="w-64 flex-shrink-0 flex flex-col"
+        className={`fixed inset-y-0 left-0 z-50 w-64 flex flex-col transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${
+          isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+        }`}
         style={{ background: 'linear-gradient(180deg, #0f0c29 0%, #302b63 100%)' }}
       >
-        <div className="p-5 border-b border-white/10">
+        <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
               <Sparkles className="h-5 w-5 text-white" />
@@ -69,6 +81,13 @@ export default function AdminCustomers() {
               <div className="text-white/50 text-xs">Admin Panel</div>
             </div>
           </Link>
+          <button
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="lg:hidden p-1.5 rounded-lg text-white/60 hover:text-white transition-colors"
+            aria-label="Close menu"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {navItems.map((item) => (
@@ -76,6 +95,7 @@ export default function AdminCustomers() {
               key={item.href}
               href={item.href}
               className={`admin-nav-item ${item.href === '/admin/customers' ? 'active' : ''}`}
+              onClick={() => setIsMobileMenuOpen(false)}
             >
               <item.icon className="h-4 w-4 flex-shrink-0" />
               {item.label}
@@ -96,32 +116,39 @@ export default function AdminCustomers() {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 overflow-auto bg-gray-50">
-        <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
-          <div className="flex items-center gap-3">
-            <Link href="/admin" className="p-2 hover:bg-gray-100 rounded-lg transition-all">
+      <main className="flex-1 overflow-auto bg-gray-50 min-w-0">
+        <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3.5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between sticky top-0 z-10 gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="lg:hidden p-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-100 shrink-0"
+              aria-label="Open menu"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <Link href="/admin" className="p-2 hover:bg-gray-100 rounded-lg transition-all shrink-0">
               <ChevronLeft className="h-5 w-5 text-gray-500" />
             </Link>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Customers</h1>
-              <p className="text-sm text-gray-400">
+              <h1 className="text-lg sm:text-xl font-bold text-gray-900">Customers</h1>
+              <p className="text-xs text-gray-400">
                 {pagination?.total || 0} total · {customers.filter(c => c.whatsappConsent).length} WhatsApp consent
               </p>
             </div>
           </div>
-          <div className="relative">
+          <div className="relative w-full sm:w-72">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
               placeholder="Search by name, email, phone..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 w-72"
+              className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
             />
           </div>
         </header>
 
-        <div className="p-6">
+        <div className="p-3 sm:p-6 space-y-4 sm:space-y-6">
           {/* Info Banner */}
           <div className="bg-green-50 border border-green-200 rounded-2xl p-4 mb-5 flex items-center gap-3">
             <MessageCircle className="h-5 w-5 text-green-600 flex-shrink-0" />

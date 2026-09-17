@@ -172,8 +172,11 @@ h1, h2, h3, h4, h5, h6 {
   /* ─── Input Styles ──────────────────────────── */
   .input-brand {
     width: 100%;
-    padding: 0.75rem 1rem;
-    border-radius: 0.375rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border-radius: 0.5rem;
     border: 1px solid #d1d5db;
     font-size: 0.875rem;
     background-color: #ffffff;
@@ -266,8 +269,9 @@ html, body {
   /* Touch-friendly inputs and buttons for mobile login & register */
   .input-brand {
     font-size: 1rem; /* 16px prevents iOS Safari auto-zoom */
-    padding: 0.75rem 0.875rem;
-    min-height: 44px;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    min-height: 46px;
   }
 
   /* Mobile buttons target minimum touch size */

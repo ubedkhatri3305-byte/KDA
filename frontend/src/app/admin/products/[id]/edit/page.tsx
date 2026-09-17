@@ -155,19 +155,19 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       <div className="max-w-3xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <Link href="/admin/products" className="p-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50">
+        <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <Link href="/admin/products" className="p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors shrink-0">
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Edit Product</h1>
-            <p className="text-gray-500 text-sm">Update pricing, inventory, and details.</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Edit Product</h1>
+            <p className="text-gray-500 text-xs sm:text-sm">Update pricing, inventory, and details.</p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-6 space-y-6">
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Product Name <span className="text-red-500">*</span></label>
@@ -176,19 +176,19 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black"
+                className="w-full px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-black"
                 required
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Main Category <span className="text-red-500">*</span></label>
                 <select
                   name="mainCategoryId"
                   value={formData.mainCategoryId}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black"
+                  className="w-full px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-black bg-white"
                   required
                 >
                   <option value="">Select Category</option>
@@ -204,7 +204,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   name="categoryId"
                   value={formData.categoryId}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black disabled:bg-gray-100 disabled:text-gray-500"
+                  className="w-full px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-black bg-white disabled:bg-gray-100 disabled:text-gray-500"
                   required
                   disabled={!formData.mainCategoryId || subCategories.length === 0}
                 >
@@ -216,7 +216,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Base Price (₹) <span className="text-red-500">*</span></label>
                 <input
@@ -224,7 +224,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   name="basePrice"
                   value={formData.basePrice}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black"
+                  className="w-full px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-black"
                   min="0"
                   step="1"
                   required
@@ -238,23 +238,21 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   name="sizes"
                   value={formData.sizes}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black"
+                  className="w-full px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-black"
                 />
                 <p className="text-xs text-gray-500 mt-1">Separate sizes with commas. Leave blank if standard piece.</p>
               </div>
             </div>
 
-
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Update Product Image (Optional)</label>
-              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md bg-gray-50 hover:bg-gray-100 transition-colors">
+              <div className="mt-1 flex justify-center px-4 sm:px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
                 <div className="space-y-1 text-center">
-                  <UploadCloud className="mx-auto h-12 w-12 text-gray-400" />
+                  <UploadCloud className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-gray-400" />
                   <div className="flex text-sm text-gray-600 justify-center">
                     <label
                       htmlFor="file-upload"
-                      className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500 px-2 py-1"
+                      className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500 px-2 py-1 shadow-sm border border-gray-200"
                     >
                       <span>Upload a new file</span>
                       <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleFileChange} accept="image/*" />
@@ -262,7 +260,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   </div>
                   <p className="text-xs text-gray-500">Only upload if you want to replace existing image.</p>
                   {selectedFile && (
-                    <p className="text-sm font-medium text-green-600 mt-2">Selected: {selectedFile.name}</p>
+                    <p className="text-xs sm:text-sm font-medium text-green-600 mt-2 truncate max-w-[250px] mx-auto">Selected: {selectedFile.name}</p>
                   )}
                 </div>
               </div>
@@ -275,16 +273,16 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 value={formData.description}
                 onChange={handleChange}
                 rows={4}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black resize-none"
+                className="w-full px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-black resize-none"
               />
             </div>
           </div>
 
-          <div className="pt-4 border-t border-gray-100 flex justify-end">
+          <div className="pt-4 border-t border-gray-100 flex flex-col sm:flex-row justify-end gap-3">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-6 py-2.5 bg-black text-white font-medium rounded-md hover:bg-gray-800 disabled:opacity-70 transition-colors"
+              className="flex items-center justify-center gap-2 px-6 py-2.5 bg-black text-white font-medium rounded-lg hover:bg-gray-800 disabled:opacity-70 transition-colors w-full sm:w-auto"
             >
               {isSubmitting ? (
                 <><Loader2 className="h-4 w-4 animate-spin" /> Saving...</>
