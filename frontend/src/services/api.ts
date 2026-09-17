@@ -19,34 +19,36 @@ export const getBaseUrl = (): string => {
       return `http://${host}:5000/api/v1`;
     }
 
-    // Production / Vercel deployment: use configured API URL
+    // Production / Vercel deployment: use configured API URL if valid
     if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
-      return envUrl;
+      return envUrl.endsWith('/api/v1') ? envUrl : `${envUrl.replace(/\/$/, '')}/api/v1`;
     }
 
-    // Fallback for Vercel / live domain
-    return envUrl || DEFAULT_PRODUCTION_API_URL;
+    // Default to relative /api/v1 on Vercel so Next.js rewrites proxy cleanly without CORS issues
+    return '/api/v1';
   }
 
   // 2. Server-side / build fallback
   if (process.env.NODE_ENV === 'production') {
-    return envUrl || DEFAULT_PRODUCTION_API_URL;
+    if (envUrl && !envUrl.includes('localhost')) {
+      return envUrl.endsWith('/api/v1') ? envUrl : `${envUrl.replace(/\/$/, '')}/api/v1`;
+    }
+    return DEFAULT_PRODUCTION_API_URL;
   }
   return envUrl || 'http://localhost:5000/api/v1';
 };
 
-const API_URL = getBaseUrl();
-
 export const apiClient = axios.create({
-  baseURL: API_URL,
+  baseURL: getBaseUrl(),
   timeout: 30000,
   withCredentials: true,
 });
 
-// Request interceptor - attach token
+// Request interceptor - dynamic baseURL & attach token
 apiClient.interceptors.request.use(
   (config) => {
     if (typeof window !== 'undefined') {
+      config.baseURL = getBaseUrl();
       const token = localStorage.getItem('accessToken');
       if (token) config.headers.Authorization = `Bearer ${token}`;
     }
@@ -63,7 +65,8 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        const response = await axios.post(`${API_URL}/auth/refresh`, {}, { withCredentials: true });
+        const currentBase = getBaseUrl();
+        const response = await axios.post(`${currentBase}/auth/refresh`, {}, { withCredentials: true });
         const { accessToken } = response.data.data;
         localStorage.setItem('accessToken', accessToken);
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;

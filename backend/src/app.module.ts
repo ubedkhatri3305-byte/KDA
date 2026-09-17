@@ -31,6 +31,9 @@ import cloudinaryConfig from './config/cloudinary.config';
 import aiConfig from './config/ai.config';
 import mailConfig from './config/mail.config';
 
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+
 @Module({
   imports: [
     // Config
@@ -82,7 +85,9 @@ import mailConfig from './config/mail.config';
     BlogsModule,
     ShippingModule,
   ],
+  controllers: [AppController],
   providers: [
+    AppService,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
