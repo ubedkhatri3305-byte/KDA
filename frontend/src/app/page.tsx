@@ -24,8 +24,14 @@ export default function HomePage() {
     queryFn: () => bannersApi.getAll({ position: 'home' }),
   });
 
+  const { data: allProductsData, isLoading: isLoadingAll } = useQuery({
+    queryKey: ['products', 'all-home'],
+    queryFn: () => productsApi.getAll({ limit: 12 }),
+  });
+
   const trending: any[] = (trendingData as any)?.data || [];
   const newArrivals: any[] = (newArrivalsData as any)?.data || [];
+  const allProducts: any[] = (allProductsData as any)?.data || [];
   const activeBanners: any[] = ((bannersData as any)?.data || []).filter((b: any) => b.isActive);
 
   const categories = [
@@ -129,6 +135,40 @@ export default function HomePage() {
                   <ProductCard key={product.id} product={product} index={i} />
                 ))}
               </div>
+            </div>
+          </section>
+        )}
+
+        {/* Featured Products fallback when trending or new arrivals are empty */}
+        {trending.length === 0 && newArrivals.length === 0 && (
+          <section className="py-8 bg-white">
+            <div className="container mx-auto px-4">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Featured Products</h2>
+                <Link href="/products" className="text-sm text-gray-600 hover:text-black font-medium flex items-center transition-colors">
+                  View All <ChevronRight className="h-4 w-4 ml-1" />
+                </Link>
+              </div>
+              {isLoadingAll ? (
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                  {[1, 2, 3, 4, 5, 6].map((n) => (
+                    <div key={n} className="h-64 rounded-xl shimmer" />
+                  ))}
+                </div>
+              ) : allProducts.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                  {allProducts.slice(0, 10).map((product: any, i) => (
+                    <ProductCard key={product.id} product={product} index={i} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-gray-500">
+                  <p>Discover our full catalog in our store.</p>
+                  <Link href="/products" className="mt-3 inline-block px-5 py-2 bg-black text-white rounded-lg text-sm font-medium">
+                    Browse All Products
+                  </Link>
+                </div>
+              )}
             </div>
           </section>
         )}

@@ -5,30 +5,30 @@ const DEFAULT_PRODUCTION_API_URL = 'https://kda-backend.onrender.com/api/v1';
 export const getBaseUrl = (): string => {
   const envUrl = process.env.NEXT_PUBLIC_API_URL;
 
-  // 1. If explicit production / external API URL is configured (Render, custom domain, etc.)
-  if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
-    return envUrl;
-  }
-
-  // 2. In browser environment (handles all mobile devices, tablets, and desktops)
+  // 1. In browser environment
   if (typeof window !== 'undefined') {
     const host = window.location.hostname;
 
-    // Running on Vercel or any live production domain
-    if (
-      host.includes('vercel.app') ||
-      (!host.startsWith('192.168.') && !host.startsWith('10.') && host !== 'localhost' && host !== '127.0.0.1')
-    ) {
-      return envUrl || DEFAULT_PRODUCTION_API_URL;
+    // Localhost or 127.0.0.1 on laptop/desktop
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return 'http://localhost:5000/api/v1';
     }
 
-    // Accessing on local Wi-Fi / LAN from a mobile device (192.168.x.x, 10.x.x.x)
-    if (host !== 'localhost' && host !== '127.0.0.1') {
-      return '/api/v1';
+    // Local Wi-Fi / LAN testing on mobile phones, tablets, or other PCs
+    if (host.startsWith('192.168.') || host.startsWith('10.') || host.startsWith('172.')) {
+      return `http://${host}:5000/api/v1`;
     }
+
+    // Production / Vercel deployment: use configured API URL
+    if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+      return envUrl;
+    }
+
+    // Fallback for Vercel / live domain
+    return envUrl || DEFAULT_PRODUCTION_API_URL;
   }
 
-  // 3. Localhost or server-side fallback
+  // 2. Server-side / build fallback
   if (process.env.NODE_ENV === 'production') {
     return envUrl || DEFAULT_PRODUCTION_API_URL;
   }

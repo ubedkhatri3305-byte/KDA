@@ -172,11 +172,11 @@ export function Navbar() {
               </button>
 
               {/* Auth - ALWAYS visible on mobile & desktop */}
-              {isAuthenticated && user ? (
+              {mounted && isAuthenticated && user?.firstName ? (
                 <div className="relative group shrink-0">
                   <button className="flex items-center gap-1.5 p-1.5 md:px-3 md:py-1.5 rounded-xl hover:bg-gray-100 transition-all">
                     <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white text-sm font-bold shrink-0">
-                      {user.firstName[0]}
+                      {(user.firstName[0] || 'U').toUpperCase()}
                     </div>
                     <span className="hidden md:block text-sm font-medium text-gray-700">{user.firstName}</span>
                   </button>
@@ -201,7 +201,7 @@ export function Navbar() {
               ) : (
                 <Link
                   href="/login"
-                  className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-black text-white text-xs sm:text-sm font-medium hover:bg-gray-800 transition-all shrink-0 shadow-sm"
+                  className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-black text-white text-xs sm:text-sm font-medium hover:bg-gray-800 transition-all shrink-0 shadow-sm"
                   aria-label="Sign In"
                 >
                   <User className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
@@ -232,18 +232,18 @@ export function Navbar() {
             >
               <div className="container mx-auto px-4 py-4 space-y-3">
                 {/* Auth section at top of mobile menu */}
-                {isAuthenticated && user ? (
+                {mounted && isAuthenticated && user?.firstName ? (
                   <div className="p-3 bg-gray-50 rounded-xl space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
                         <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold text-sm">
-                          {user.firstName[0]}
+                          {(user.firstName[0] || 'U').toUpperCase()}
                         </div>
                         <div>
                           <p className="text-sm font-semibold text-gray-900 leading-tight">
                             {user.firstName} {user.lastName || ''}
                           </p>
-                          <p className="text-xs text-gray-500 leading-tight">{user.email}</p>
+                          <p className="text-xs text-gray-500 leading-tight">{user.email || ''}</p>
                         </div>
                       </div>
                       <button
@@ -404,12 +404,12 @@ export function Navbar() {
           <span className="text-[10px] font-semibold">Cart</span>
         </button>
         <Link
-          href={mounted && isAuthenticated ? "/profile" : "/login"}
+          href={mounted && isAuthenticated && user?.firstName ? "/profile" : "/login"}
           className="flex flex-col items-center gap-0.5 text-white min-w-[56px] py-1.5 px-3 bg-black rounded-xl shadow-sm active:scale-95 transition-transform shrink-0"
         >
           <User className="h-4 w-4 text-white" />
           <span className="text-[10px] font-bold text-white whitespace-nowrap">
-            {mounted && isAuthenticated ? 'Account' : 'Sign In'}
+            {mounted && isAuthenticated && user?.firstName ? 'Account' : 'Sign In'}
           </span>
         </Link>
       </nav>
