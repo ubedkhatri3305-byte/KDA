@@ -102,7 +102,7 @@ export function AiChatWidget() {
       const errorMsg: Message = {
         id: uuidv4(),
         role: 'assistant',
-        content: "I'm having trouble connecting right now. Please try again or contact us at support@kda.in 😊",
+        content: "I'm having trouble connecting right now. Please try again or contact us at khatridaudadam987@gmail.com 😊",
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMsg]);

@@ -1,7 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import { Sparkles, Mail, Phone, MapPin, Globe, Share2, MessageCircle, Play } from 'lucide-react';
+import { Sparkles, Mail, Phone, MapPin, MessageCircle } from 'lucide-react';
+
+function InstagramIcon({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+    </svg>
+  );
+}
 
 export function Footer() {
   return (
@@ -20,11 +30,24 @@ export function Footer() {
               Your destination for simple and beautiful fashion.
             </p>
             <div className="flex gap-3">
-              {[Globe, Share2, MessageCircle, Play].map((Icon, i) => (
-                <a key={i} href="#" className="w-9 h-9 rounded bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition-all text-gray-600">
-                  <Icon className="h-4 w-4" />
-                </a>
-              ))}
+              <a
+                href="https://www.instagram.com/khatri_daudadam?stkn=MXdrY2M4MThhYXA5cA=="
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Follow us on Instagram"
+                className="w-9 h-9 rounded bg-white border border-gray-200 flex items-center justify-center hover:bg-pink-50 hover:border-pink-300 hover:text-pink-600 transition-all text-gray-600 shadow-xs"
+              >
+                <InstagramIcon className="h-4 w-4" />
+              </a>
+              <a
+                href="https://wa.me/919898270987"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Chat on WhatsApp"
+                className="w-9 h-9 rounded bg-white border border-gray-200 flex items-center justify-center hover:bg-green-50 hover:border-green-300 hover:text-green-600 transition-all text-gray-600 shadow-xs"
+              >
+                <MessageCircle className="h-4 w-4" />
+              </a>
             </div>
 
           </div>
@@ -67,21 +90,53 @@ export function Footer() {
 
           {/* Contact & Policies */}
           <div>
-            <h3 className="font-semibold text-gray-900 mb-4">Support</h3>
-            <ul className="space-y-3 mb-6">
+            <h3 className="font-semibold text-gray-900 mb-4">Contact & Support</h3>
+            <ul className="space-y-3 mb-4">
               <li className="flex items-start gap-2 text-gray-600 text-sm">
                 <Mail className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" />
-                support@kda.in
+                <a href="mailto:khatridaudadam987@gmail.com" className="hover:text-black transition-colors break-all">
+                  khatridaudadam987@gmail.com
+                </a>
               </li>
               <li className="flex items-start gap-2 text-gray-600 text-sm">
                 <Phone className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" />
-                +91 1800-123-4567
+                <a href="tel:+919898270987" className="hover:text-black transition-colors">
+                  +91 9898270987
+                </a>
               </li>
               <li className="flex items-start gap-2 text-gray-600 text-sm">
                 <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" />
-                Mumbai, Maharashtra, India
+                <span>Moti Bhujpur, Mundra, Kutch, Gujarat, India</span>
               </li>
             </ul>
+
+            {/* Instagram QR Code / Barcode */}
+            <div className="pt-2">
+              <a
+                href="https://www.instagram.com/khatri_daudadam?stkn=MXdrY2M4MThhYXA5cA=="
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group block p-3 bg-white border border-gray-200 rounded-xl shadow-xs hover:border-pink-500 hover:shadow-md transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-16 h-16 bg-white p-1 rounded-lg border border-gray-100 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                    <img
+                      src="/instagram-qr.png"
+                      alt="Instagram QR Barcode - @khatri_daudadam"
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform"
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1 text-pink-600 font-semibold text-xs mb-0.5">
+                      <InstagramIcon className="h-3.5 w-3.5" />
+                      <span>Follow on Instagram</span>
+                    </div>
+                    <p className="text-gray-900 font-medium text-xs truncate">@khatri_daudadam</p>
+                    <p className="text-gray-400 text-[10px] mt-0.5">Scan or tap to open profile</p>
+                  </div>
+                </div>
+              </a>
+            </div>
 
           </div>
         </div>

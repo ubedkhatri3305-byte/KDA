@@ -126,7 +126,7 @@ export default function CheckoutPage() {
                 <span>7-Day Return & Exchange Policy</span>
               </div>
               <p className="text-emerald-700 leading-relaxed">
-                Enjoy hassle-free returns within 7 days of delivery for unused items. We handle returns directly via WhatsApp or support@kda.in.
+                Enjoy hassle-free returns within 7 days of delivery for unused items. We handle returns directly via WhatsApp or khatridaudadam987@gmail.com.
               </p>
             </div>
             <button
