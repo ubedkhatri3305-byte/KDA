@@ -1,23 +1,38 @@
 import axios from 'axios';
 
-const getBaseUrl = (): string => {
-  // 1. If configured via environment variable (Vercel / Production), always use it
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
+const DEFAULT_PRODUCTION_API_URL = 'https://kda-backend.onrender.com/api/v1';
+
+export const getBaseUrl = (): string => {
+  const envUrl = process.env.NEXT_PUBLIC_API_URL;
+
+  // 1. If explicit production / external API URL is configured (Render, custom domain, etc.)
+  if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+    return envUrl;
   }
-  // 2. Client-side local dev fallback
+
+  // 2. In browser environment (handles all mobile devices, tablets, and desktops)
   if (typeof window !== 'undefined') {
     const host = window.location.hostname;
+
+    // Running on Vercel or any live production domain
     if (
-      host === 'localhost' ||
-      host === '127.0.0.1' ||
-      host.startsWith('192.168.') ||
-      host.startsWith('10.')
+      host.includes('vercel.app') ||
+      (!host.startsWith('192.168.') && !host.startsWith('10.') && host !== 'localhost' && host !== '127.0.0.1')
     ) {
-      return `http://${host}:5000/api/v1`;
+      return envUrl || DEFAULT_PRODUCTION_API_URL;
+    }
+
+    // Accessing on local Wi-Fi / LAN from a mobile device (192.168.x.x, 10.x.x.x)
+    if (host !== 'localhost' && host !== '127.0.0.1') {
+      return '/api/v1';
     }
   }
-  return 'http://localhost:5000/api/v1';
+
+  // 3. Localhost or server-side fallback
+  if (process.env.NODE_ENV === 'production') {
+    return envUrl || DEFAULT_PRODUCTION_API_URL;
+  }
+  return envUrl || 'http://localhost:5000/api/v1';
 };
 
 const API_URL = getBaseUrl();

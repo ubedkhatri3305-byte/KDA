@@ -223,3 +223,89 @@ h1, h2, h3, h4, h5, h6 {
 .premium-gradient-bg {
   background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
 }
+
+/* ─── Mobile Media Queries & Responsive Enhancements ───────────────────────────── */
+
+/* Prevent horizontal scroll on mobile devices */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+@media screen and (max-width: 768px) {
+  /* Ensure smooth mobile touch scrolling */
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Safe space at the bottom for fixed bottom navigation */
+  main {
+    padding-bottom: 4.5rem;
+  }
+
+  /* Top navbar container on mobile */
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  /* Mobile product grid & card optimizations */
+  .product-card {
+    border-radius: 0.625rem;
+  }
+
+  .product-card .price-current {
+    font-size: 0.875rem;
+  }
+
+  .product-card .price-original,
+  .product-card .price-discount {
+    font-size: 0.75rem;
+  }
+
+  /* Touch-friendly inputs and buttons for mobile login & register */
+  .input-brand {
+    font-size: 1rem; /* 16px prevents iOS Safari auto-zoom */
+    padding: 0.75rem 0.875rem;
+    min-height: 44px;
+  }
+
+  /* Mobile buttons target minimum touch size */
+  button, a {
+    touch-action: manipulation;
+  }
+
+  /* Auth cards on mobile */
+  .auth-card {
+    padding: 1.25rem !important;
+    margin: 0 0.5rem;
+    border-radius: 1rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  /* Extra small screens (iPhone SE, small Androids) */
+  .product-card h3 {
+    font-size: 0.8125rem;
+    line-height: 1.25;
+  }
+
+  .btn-brand {
+    padding: 0.625rem 1rem;
+    font-size: 0.8125rem;
+  }
+
+  /* Ensure bottom nav icons and text fit comfortably */
+  [aria-label="Mobile Bottom Navigation"] a,
+  [aria-label="Mobile Bottom Navigation"] button {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+}
+
+/* Safe area insets for modern mobile devices (iPhone notch/pill) */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  [aria-label="Mobile Bottom Navigation"] {
+    padding-bottom: calc(0.375rem + env(safe-area-inset-bottom));
+  }
+}

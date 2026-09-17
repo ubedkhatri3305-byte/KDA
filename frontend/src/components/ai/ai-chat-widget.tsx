@@ -156,9 +156,9 @@ export function AiChatWidget() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            className="fixed bottom-24 right-4 md:right-6 z-50 w-[calc(100vw-2rem)] max-w-[400px]"
+            className="fixed bottom-20 md:bottom-24 right-2 sm:right-4 md:right-6 z-50 w-[calc(100vw-1rem)] sm:w-[calc(100vw-2rem)] max-w-[400px]"
           >
-            <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col max-h-[85vh]">
+            <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col max-h-[calc(100vh-6rem)] md:max-h-[85vh]">
               {/* Header */}
               <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-4 flex-shrink-0">
                 <div className="flex items-center justify-between">
@@ -378,9 +378,10 @@ export function AiChatWidget() {
       {/* Floating Button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-4 md:right-6 z-50 w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center"
+        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
+        aria-label="Toggle AI Stylist Chat"
       >
         <AnimatePresence mode="wait">
           {isOpen ? (

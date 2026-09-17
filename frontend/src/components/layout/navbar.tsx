@@ -133,18 +133,18 @@ export function Navbar() {
             </div>
 
             {/* Right Actions */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
               {/* Search */}
               <button
                 onClick={() => setSearchOpen(true)}
-                className="p-2.5 rounded-xl text-gray-600 hover:text-black hover:bg-gray-50 transition-all"
+                className="p-2 sm:p-2.5 rounded-xl text-gray-600 hover:text-black hover:bg-gray-50 transition-all shrink-0"
                 aria-label="Search"
               >
                 <Search className="h-5 w-5" />
               </button>
 
-              {/* Wishlist */}
-              <Link href="/wishlist" className="relative p-2.5 rounded-xl text-gray-600 hover:text-black hover:bg-gray-50 transition-all">
+              {/* Wishlist - hidden on tiny mobile in top bar since it is in bottom bar and drawer */}
+              <Link href="/wishlist" className="hidden sm:flex relative p-2.5 rounded-xl text-gray-600 hover:text-black hover:bg-gray-50 transition-all shrink-0">
                 <Heart className="h-5 w-5" />
                 {wishlistCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
@@ -156,7 +156,7 @@ export function Navbar() {
               {/* Cart */}
               <button
                 onClick={openCart}
-                className="relative p-2.5 rounded-xl text-gray-600 hover:text-black hover:bg-gray-100 transition-all"
+                className="relative p-2 sm:p-2.5 rounded-xl text-gray-600 hover:text-black hover:bg-gray-100 transition-all shrink-0"
                 aria-label="Cart"
               >
                 <ShoppingBag className="h-5 w-5" />
@@ -171,16 +171,16 @@ export function Navbar() {
                 )}
               </button>
 
-              {/* Auth */}
+              {/* Auth - ALWAYS visible on mobile & desktop */}
               {isAuthenticated && user ? (
-                <div className="relative group">
+                <div className="relative group shrink-0">
                   <button className="flex items-center gap-1.5 p-1.5 md:px-3 md:py-1.5 rounded-xl hover:bg-gray-100 transition-all">
-                    <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white text-sm font-bold">
+                    <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white text-sm font-bold shrink-0">
                       {user.firstName[0]}
                     </div>
                     <span className="hidden md:block text-sm font-medium text-gray-700">{user.firstName}</span>
                   </button>
-                  <div className="absolute right-0 top-full mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 min-w-[180px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                  <div className="absolute right-0 top-full mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 min-w-[180px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                     {user.role !== 'CUSTOMER' && (
                       <Link href="/admin" className="flex items-center gap-3 px-4 py-2.5 text-sm text-black font-medium hover:bg-gray-50">
                         <Sparkles className="h-4 w-4" /> Admin Panel
@@ -201,17 +201,17 @@ export function Navbar() {
               ) : (
                 <Link
                   href="/login"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black text-white text-xs md:text-sm font-medium hover:bg-gray-800 transition-all"
+                  className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-black text-white text-xs sm:text-sm font-medium hover:bg-gray-800 transition-all shrink-0 shadow-sm"
                   aria-label="Sign In"
                 >
-                  <User className="h-4 w-4" />
-                  <span>Sign In</span>
+                  <User className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+                  <span className="font-semibold whitespace-nowrap">Sign In</span>
                 </Link>
               )}
 
               {/* Mobile Menu */}
               <button
-                className="lg:hidden p-2.5 rounded-xl text-gray-600 hover:bg-gray-50"
+                className="lg:hidden p-2 sm:p-2.5 rounded-xl text-gray-600 hover:bg-gray-50 shrink-0"
                 onClick={() => setIsMobileOpen(!isMobileOpen)}
                 aria-label="Open menu"
               >
@@ -375,17 +375,17 @@ export function Navbar() {
       {/* Mobile Bottom Sticky Navigation - 100% Guaranteed Visibility on Phone */}
       <nav
         aria-label="Mobile Bottom Navigation"
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-gray-200 py-1.5 px-3 flex justify-around items-center shadow-[0_-4px_16px_rgba(0,0,0,0.08)]"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200 py-1.5 px-2 sm:px-4 flex justify-around items-center shadow-[0_-4px_16px_rgba(0,0,0,0.08)]"
       >
-        <Link href="/" className="flex flex-col items-center gap-0.5 text-gray-700 hover:text-black min-w-[48px] py-1">
+        <Link href="/" className="flex flex-col items-center gap-0.5 text-gray-700 hover:text-black min-w-[44px] py-1">
           <Home className="h-5 w-5" />
           <span className="text-[10px] font-semibold">Home</span>
         </Link>
-        <button onClick={() => setSearchOpen(true)} className="flex flex-col items-center gap-0.5 text-gray-700 hover:text-black min-w-[48px] py-1">
+        <button onClick={() => setSearchOpen(true)} className="flex flex-col items-center gap-0.5 text-gray-700 hover:text-black min-w-[44px] py-1">
           <Search className="h-5 w-5" />
           <span className="text-[10px] font-semibold">Search</span>
         </button>
-        <Link href="/wishlist" className="relative flex flex-col items-center gap-0.5 text-gray-700 hover:text-black min-w-[48px] py-1">
+        <Link href="/wishlist" className="relative flex flex-col items-center gap-0.5 text-gray-700 hover:text-black min-w-[44px] py-1">
           <Heart className="h-5 w-5" />
           {wishlistCount > 0 && (
             <span className="absolute top-0 right-2 bg-black text-white text-[9px] rounded-full w-3.5 h-3.5 flex items-center justify-center font-bold">
@@ -394,7 +394,7 @@ export function Navbar() {
           )}
           <span className="text-[10px] font-semibold">Wishlist</span>
         </Link>
-        <button onClick={openCart} className="relative flex flex-col items-center gap-0.5 text-gray-700 hover:text-black min-w-[48px] py-1">
+        <button onClick={openCart} className="relative flex flex-col items-center gap-0.5 text-gray-700 hover:text-black min-w-[44px] py-1">
           <ShoppingBag className="h-5 w-5" />
           {cartCount > 0 && (
             <span className="absolute top-0 right-2 bg-black text-white text-[9px] rounded-full w-3.5 h-3.5 flex items-center justify-center font-bold">
@@ -405,17 +405,14 @@ export function Navbar() {
         </button>
         <Link
           href={mounted && isAuthenticated ? "/profile" : "/login"}
-          className="flex flex-col items-center gap-0.5 text-black hover:text-gray-700 min-w-[56px] py-1 bg-black text-white rounded-xl px-3 shadow-sm"
+          className="flex flex-col items-center gap-0.5 text-white min-w-[56px] py-1.5 px-3 bg-black rounded-xl shadow-sm active:scale-95 transition-transform shrink-0"
         >
           <User className="h-4 w-4 text-white" />
-          <span className="text-[10px] font-bold text-white">
+          <span className="text-[10px] font-bold text-white whitespace-nowrap">
             {mounted && isAuthenticated ? 'Account' : 'Sign In'}
           </span>
         </Link>
       </nav>
-
-      {/* Spacer for bottom bar on mobile */}
-      <div className="lg:hidden h-14" />
     </>
   );
 }

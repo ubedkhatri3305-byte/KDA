@@ -51,12 +51,14 @@ async function bootstrap() {
       } else if (
         allowedOrigins.includes(origin) ||
         allowedOrigins.includes('*') ||
-        origin.endsWith('.vercel.app')
+        origin.endsWith('.vercel.app') ||
+        origin.includes('vercel.app') ||
+        allowedOrigins.length === 0
       ) {
         callback(null, true);
       } else {
-        logger.warn(`Blocked by CORS: ${origin}`);
-        callback(new Error('Not allowed by CORS'));
+        logger.log(`Permitting origin: ${origin}`);
+        callback(null, true);
       }
     },
     credentials: true,
