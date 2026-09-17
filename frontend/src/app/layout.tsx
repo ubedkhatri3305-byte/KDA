@@ -25,7 +25,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://kda-git-main-ubed-khatri.vercel.app'),
   title: {
     default: 'K D A - Clothing Store | Buy Sarees, Kurtis, Dresses Online',
     template: '%s | K D A',
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_IN',
-    url: 'http://localhost:3000',
+    url: 'https://kda-git-main-ubed-khatri.vercel.app',
     siteName: 'K D A',
     title: 'K D A - Fashion Store',
     description: 'Shop the latest fashion. Free shipping on ₹999+',

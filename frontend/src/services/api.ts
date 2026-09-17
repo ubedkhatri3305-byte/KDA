@@ -2,6 +2,34 @@ import axios from 'axios';
 
 const DEFAULT_PRODUCTION_API_URL = 'https://kda-km8t.onrender.com/api/v1';
 
+export const sanitizeApiUrl = (rawUrl?: string): string => {
+  if (!rawUrl || typeof rawUrl !== 'string') {
+    return DEFAULT_PRODUCTION_API_URL;
+  }
+  let url = rawUrl.trim().replace(/\/+$/, '');
+
+  // Redirect any references to the obsolete/broken backend domain
+  if (url.includes('kda-backend.onrender.com')) {
+    url = url.replace('kda-backend.onrender.com', 'kda-km8t.onrender.com');
+  }
+
+  // Force HTTPS for any remote origin (e.g. Render, Vercel, cloud hosts) to prevent Mixed Content security blocking
+  if (
+    url.startsWith('http://') &&
+    !url.includes('localhost') &&
+    !url.includes('127.0.0.1') &&
+    !url.match(/^http:\/\/(192\.168\.|10\.|172\.)/)
+  ) {
+    url = url.replace(/^http:\/\//i, 'https://');
+  }
+
+  // Ensure /api/v1 path suffix
+  if (!url.endsWith('/api/v1')) {
+    url = `${url}/api/v1`;
+  }
+  return url;
+};
+
 export const getBaseUrl = (): string => {
   const envUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -14,15 +42,18 @@ export const getBaseUrl = (): string => {
       return 'http://localhost:5000/api/v1';
     }
 
-    // Local Wi-Fi / LAN testing on mobile phones, tablets, or other PCs
-    if (host.startsWith('192.168.') || host.startsWith('10.') || host.startsWith('172.')) {
+    // Local Wi-Fi / LAN testing on mobile phones, tablets, or other PCs (direct LAN IP)
+    if (/^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[0-1])\.)/.test(host)) {
       return `http://${host}:5000/api/v1`;
     }
 
     // Production / Vercel deployment: use configured API URL if valid
     if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
-      const cleanUrl = envUrl.replace(/\/+$/, '');
-      return cleanUrl.endsWith('/api/v1') ? cleanUrl : `${cleanUrl}/api/v1`;
+      let resolved = sanitizeApiUrl(envUrl);
+      if (window.location.protocol === 'https:' && resolved.startsWith('http://')) {
+        resolved = resolved.replace(/^http:\/\//i, 'https://');
+      }
+      return resolved;
     }
 
     // Direct live backend on Render
@@ -31,9 +62,8 @@ export const getBaseUrl = (): string => {
 
   // 2. Server-side / build fallback
   if (process.env.NODE_ENV === 'production') {
-    if (envUrl && !envUrl.includes('localhost')) {
-      const cleanUrl = envUrl.replace(/\/+$/, '');
-      return cleanUrl.endsWith('/api/v1') ? cleanUrl : `${cleanUrl}/api/v1`;
+    if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+      return sanitizeApiUrl(envUrl);
     }
     return DEFAULT_PRODUCTION_API_URL;
   }

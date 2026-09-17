@@ -16,7 +16,18 @@ const nextConfig: NextConfig = {
         ? 'https://kda-km8t.onrender.com/api/v1'
         : 'http://127.0.0.1:5000/api/v1');
 
-    backendUrl = backendUrl.replace(/\/+$/, '');
+    backendUrl = backendUrl.trim().replace(/\/+$/, '');
+    if (backendUrl.includes('kda-backend.onrender.com')) {
+      backendUrl = backendUrl.replace('kda-backend.onrender.com', 'kda-km8t.onrender.com');
+    }
+    if (
+      backendUrl.startsWith('http://') &&
+      !backendUrl.includes('127.0.0.1') &&
+      !backendUrl.includes('localhost') &&
+      !backendUrl.match(/^http:\/\/(192\.168\.|10\.|172\.)/)
+    ) {
+      backendUrl = backendUrl.replace(/^http:\/\//i, 'https://');
+    }
     if (!backendUrl.endsWith('/api/v1')) {
       backendUrl = `${backendUrl}/api/v1`;
     }
