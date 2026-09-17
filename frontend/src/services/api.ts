@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const DEFAULT_PRODUCTION_API_URL = 'https://kda-backend.onrender.com/api/v1';
+const DEFAULT_PRODUCTION_API_URL = 'https://kda-km8t.onrender.com/api/v1';
 
 export const getBaseUrl = (): string => {
   const envUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -21,17 +21,19 @@ export const getBaseUrl = (): string => {
 
     // Production / Vercel deployment: use configured API URL if valid
     if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
-      return envUrl.endsWith('/api/v1') ? envUrl : `${envUrl.replace(/\/$/, '')}/api/v1`;
+      const cleanUrl = envUrl.replace(/\/+$/, '');
+      return cleanUrl.endsWith('/api/v1') ? cleanUrl : `${cleanUrl}/api/v1`;
     }
 
-    // Default to relative /api/v1 on Vercel so Next.js rewrites proxy cleanly without CORS issues
-    return '/api/v1';
+    // Direct live backend on Render
+    return DEFAULT_PRODUCTION_API_URL;
   }
 
   // 2. Server-side / build fallback
   if (process.env.NODE_ENV === 'production') {
     if (envUrl && !envUrl.includes('localhost')) {
-      return envUrl.endsWith('/api/v1') ? envUrl : `${envUrl.replace(/\/$/, '')}/api/v1`;
+      const cleanUrl = envUrl.replace(/\/+$/, '');
+      return cleanUrl.endsWith('/api/v1') ? cleanUrl : `${cleanUrl}/api/v1`;
     }
     return DEFAULT_PRODUCTION_API_URL;
   }
