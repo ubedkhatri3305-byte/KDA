@@ -225,27 +225,52 @@ export class AuthService {
   }
 
   // ─── Forgot Password ─────────────────────────────────────────
-  async forgotPassword(email: string) {
-    const user = await this.prisma.user.findUnique({ where: { email } });
+  async forgotPassword(identifier: string) {
+    const cleanId = identifier.trim();
+    const isEmail = cleanId.includes('@');
+    const user = await this.prisma.user.findFirst({
+      where: isEmail
+        ? { email: cleanId.toLowerCase() }
+        : {
+            OR: [
+              { phone: cleanId },
+              { whatsappNumber: cleanId },
+            ],
+          },
+    });
+
     if (!user) {
-      // Don't reveal if email exists
-      return { message: 'If the email exists, you will receive a reset OTP' };
+      return { message: 'If the account exists, you will receive a reset OTP' };
     }
+
     await this.sendOtp(user.id, 'password_reset');
-    return { message: 'If the email exists, you will receive a reset OTP' };
+    return {
+      message: 'If the account exists, you will receive a reset OTP',
+      identifier: user.email,
+      phone: user.phone || user.whatsappNumber,
+    };
   }
 
   // ─── Reset Password ──────────────────────────────────────────
   async resetPassword(dto: ResetPasswordDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+    const cleanId = dto.email.trim();
+    const isEmail = cleanId.includes('@');
+    const user = await this.prisma.user.findFirst({
+      where: isEmail
+        ? { email: cleanId.toLowerCase() }
+        : {
+            OR: [
+              { phone: cleanId },
+              { whatsappNumber: cleanId },
+            ],
+          },
     });
     if (!user) throw new NotFoundException('User not found');
 
     const otp = await this.prisma.otpToken.findFirst({
       where: {
         userId: user.id,
-        token: dto.otp,
+        token: dto.otp.trim(),
         type: 'password_reset',
         isUsed: false,
         expiresAt: { gt: new Date() },
