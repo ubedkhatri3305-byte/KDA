@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -39,17 +39,14 @@ export default function HomePage() {
 
   const [isPosterOpen, setIsPosterOpen] = useState(false);
   const [isAutoClosing, setIsAutoClosing] = useState(true);
+  const hasAutoOpenedRef = useRef(false);
 
-  // Auto-open poster modal for ~10 seconds on first load when active poster exists
+  // Auto-open poster modal for ~10 seconds every time page is opened by customer
   useEffect(() => {
-    if (activeBanners.length > 0) {
-      const bannerKey = `has_seen_poster_${activeBanners.map((b) => b.id).join('_')}`;
-      const alreadySeen = sessionStorage.getItem(bannerKey);
-      if (!alreadySeen) {
-        setIsPosterOpen(true);
-        setIsAutoClosing(true);
-        sessionStorage.setItem(bannerKey, 'true');
-      }
+    if (activeBanners.length > 0 && !hasAutoOpenedRef.current) {
+      hasAutoOpenedRef.current = true;
+      setIsPosterOpen(true);
+      setIsAutoClosing(true);
     }
   }, [activeBanners]);
 
