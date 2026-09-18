@@ -70,41 +70,22 @@ export default function HomePage() {
       <Navbar />
 
       <main className="flex-1">
-        {/* Dynamic Banners or Fallback Hero Section */}
-        {activeBanners.length > 0 ? (
-          <section className="bg-white border-b border-gray-200 overflow-x-auto flex snap-x snap-mandatory hide-scrollbar">
-            {activeBanners.map(banner => (
-              <div key={banner.id} className="min-w-full flex-shrink-0 snap-center relative">
-                {banner.linkUrl ? (
-                  <Link href={banner.linkUrl} className="block w-full">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    {banner.imageUrl && <img src={banner.imageUrl} alt={banner.title} className="w-full h-auto object-contain" />}
-                  </Link>
-                ) : (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  banner.imageUrl && <img src={banner.imageUrl} alt={banner.title} className="w-full h-auto object-contain" />
-                )}
-                {/* Optional overlay text if they have title/subtitle and we want to render it on top, but posters usually have text in image */}
-              </div>
-            ))}
-          </section>
-        ) : (
-          <section className="bg-white border-b border-gray-200">
-            <div className="container mx-auto px-4 py-12 md:py-16 text-center">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 gradient-text">
-                Welcome to K D A
-              </h1>
-              <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-                Discover your perfect style. Shop the latest trends in men's, women's, and kids' fashion.
-              </p>
-              <div className="flex justify-center gap-4">
-                <Link href="/products" className="bg-black text-white px-8 py-3 rounded-md font-medium hover:bg-gray-800 transition-colors">
-                  Shop Now
-                </Link>
-              </div>
+        {/* Hero Section */}
+        <section className="bg-white border-b border-gray-200">
+          <div className="container mx-auto px-4 py-12 md:py-16 text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 gradient-text">
+              Welcome to K D A
+            </h1>
+            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+              Discover your perfect style. Shop the latest trends in men's, women's, and kids' fashion.
+            </p>
+            <div className="flex justify-center gap-4">
+              <Link href="/products" className="bg-black text-white px-8 py-3 rounded-md font-medium hover:bg-gray-800 transition-colors">
+                Shop Now
+              </Link>
             </div>
-          </section>
-        )}
+          </div>
+        </section>
 
         {/* Poster Re-view Option Bar */}
         {activeBanners.length > 0 && (
