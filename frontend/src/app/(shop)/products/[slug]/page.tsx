@@ -45,6 +45,26 @@ export default function ProductDetailPage() {
     enabled: !!(productData as any)?.data?.id,
   });
 
+  const product = (productData as any)?.data;
+  const related: any[] = (relatedData as any)?.data || [];
+  const images = product?.images || [];
+  const variants = product?.variants || [];
+  const sizes = [...new Set(variants.map((v: any) => v.size).filter(Boolean))];
+  const colors = [...new Map(variants.filter((v: any) => v.color).map((v: any) => [v.color, v])).values()];
+
+  // Auto-select size or color if only one choice is available (called unconditionally at top level)
+  useEffect(() => {
+    if (sizes.length === 1 && !selectedSize) {
+      setSelectedSize(sizes[0] as string);
+    }
+  }, [sizes, selectedSize]);
+
+  useEffect(() => {
+    if (colors.length === 1 && !selectedColor) {
+      setSelectedColor((colors[0] as any).color);
+    }
+  }, [colors, selectedColor]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -69,14 +89,8 @@ export default function ProductDetailPage() {
     );
   }
 
-  const product = (productData as any)?.data;
   if (!product) return notFound();
 
-  const related: any[] = (relatedData as any)?.data || [];
-  const images = product.images || [];
-  const variants = product.variants || [];
-  const sizes = [...new Set(variants.map((v: any) => v.size).filter(Boolean))];
-  const colors = [...new Map(variants.filter((v: any) => v.color).map((v: any) => [v.color, v])).values()];
   const selectedVariant = variants.find((v: any) => {
     const sizeMatches = !selectedSize || v.size === selectedSize;
     const colorMatches = !selectedColor || v.color === selectedColor;
@@ -86,19 +100,6 @@ export default function ProductDetailPage() {
   const originalPrice = selectedVariant?.price || product.basePrice;
   const discount = currentPrice < originalPrice ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100) : 0;
   const isWishlisted = isInWishlist(product.id);
-
-  // Auto-select size or color if only one choice is available
-  useEffect(() => {
-    if (sizes.length === 1 && !selectedSize) {
-      setSelectedSize(sizes[0] as string);
-    }
-  }, [sizes, selectedSize]);
-
-  useEffect(() => {
-    if (colors.length === 1 && !selectedColor) {
-      setSelectedColor((colors[0] as any).color);
-    }
-  }, [colors, selectedColor]);
 
   const submitReview = async () => {
     if (!reviewComment.trim()) {
