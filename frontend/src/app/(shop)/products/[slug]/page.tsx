@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useParams, notFound } from 'next/navigation';
+import { useParams, useRouter, notFound } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, ShoppingBag, Star, Truck, Shield, RefreshCw, Share2, Minus, Plus, Sparkles, ChevronRight, Zap } from 'lucide-react';
@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 
 export default function ProductDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const slug = params?.slug as string;
 
   const [selectedImage, setSelectedImage] = useState(0);
@@ -29,7 +30,7 @@ export default function ProductDetailPage() {
   const [reviewComment, setReviewComment] = useState('');
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
-  const { addItem, openCart } = useCartStore();
+  const { addItem, openCart, closeCart } = useCartStore();
   const { toggle, isInWishlist } = useWishlistStore();
 
   const { data: productData, isLoading } = useQuery({
@@ -76,11 +77,28 @@ export default function ProductDetailPage() {
   const variants = product.variants || [];
   const sizes = [...new Set(variants.map((v: any) => v.size).filter(Boolean))];
   const colors = [...new Map(variants.filter((v: any) => v.color).map((v: any) => [v.color, v])).values()];
-  const selectedVariant = variants.find((v: any) => v.size === selectedSize && v.color === selectedColor);
+  const selectedVariant = variants.find((v: any) => {
+    const sizeMatches = !selectedSize || v.size === selectedSize;
+    const colorMatches = !selectedColor || v.color === selectedColor;
+    return sizeMatches && colorMatches;
+  }) || variants[0];
   const currentPrice = selectedVariant?.salePrice || selectedVariant?.price || product.salePrice || product.basePrice;
   const originalPrice = selectedVariant?.price || product.basePrice;
   const discount = currentPrice < originalPrice ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100) : 0;
   const isWishlisted = isInWishlist(product.id);
+
+  // Auto-select size or color if only one choice is available
+  useEffect(() => {
+    if (sizes.length === 1 && !selectedSize) {
+      setSelectedSize(sizes[0] as string);
+    }
+  }, [sizes, selectedSize]);
+
+  useEffect(() => {
+    if (colors.length === 1 && !selectedColor) {
+      setSelectedColor((colors[0] as any).color);
+    }
+  }, [colors, selectedColor]);
 
   const submitReview = async () => {
     if (!reviewComment.trim()) {
@@ -119,6 +137,27 @@ export default function ProductDetailPage() {
       slug: product.slug,
     });
     openCart();
+  };
+
+  const handleBuyNow = () => {
+    if (sizes.length > 0 && !selectedSize) {
+      toast.error('Please select a size');
+      return;
+    }
+    addItem({
+      productId: product.id,
+      variantId: selectedVariant?.id,
+      name: product.name,
+      image: images[0]?.url,
+      price: Number(currentPrice),
+      quantity,
+      size: selectedSize,
+      color: selectedColor,
+      slug: product.slug,
+    });
+    closeCart();
+    toast.success('Taking you to checkout...');
+    router.push('/checkout');
   };
 
   return (
@@ -328,14 +367,14 @@ export default function ProductDetailPage() {
             <div className="flex gap-3">
               <button
                 onClick={handleAddToCart}
-                className="flex-1 py-4 bg-black text-white font-semibold rounded-md flex items-center justify-center gap-2 hover:bg-gray-800 transition-all active:scale-95"
+                className="flex-1 py-4 border-2 border-black bg-white text-black font-semibold rounded-md flex items-center justify-center gap-2 hover:bg-gray-50 transition-all active:scale-95 cursor-pointer"
               >
                 <ShoppingBag className="h-5 w-5" />
                 Add to Cart
               </button>
               <button
                 onClick={() => toggle(product.id)}
-                className={`w-14 h-14 rounded-2xl border-2 flex items-center justify-center transition-all ${
+                className={`w-14 h-14 rounded-2xl border-2 flex items-center justify-center transition-all cursor-pointer ${
                   isWishlisted ? 'border-pink-500 bg-pink-50 text-pink-500' : 'border-gray-200 text-gray-400 hover:border-pink-300 hover:text-pink-500'
                 }`}
               >
@@ -344,7 +383,12 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Buy Now */}
-            <button className="w-full py-4 bg-gray-100 text-gray-900 font-semibold rounded-md hover:bg-gray-200 transition-all">
+            <button
+              id="buy-now-btn"
+              onClick={handleBuyNow}
+              className="w-full py-4 bg-gray-900 hover:bg-black text-white font-semibold rounded-md transition-all flex items-center justify-center gap-2 active:scale-95 shadow-sm cursor-pointer"
+            >
+              <Zap className="h-5 w-5 text-amber-400 fill-amber-400" />
               Buy Now
             </button>
 

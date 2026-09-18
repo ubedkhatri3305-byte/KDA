@@ -4,10 +4,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShoppingBag, Trash2, Plus, Minus, ArrowRight, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { useCartStore } from '@/store/cart.store';
 
 export function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQuantity, totalItems, totalPrice } = useCartStore();
+  const pathname = usePathname();
+
+  // Automatically close cart drawer on route change
+  useEffect(() => {
+    closeCart();
+  }, [pathname, closeCart]);
 
   return (
     <AnimatePresence>

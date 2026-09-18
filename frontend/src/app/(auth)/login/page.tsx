@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, Mail, Lock, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/auth.store';
@@ -17,11 +17,13 @@ const loginSchema = z.object({
 
 type LoginForm = z.infer<typeof loginSchema>;
 
-export default function LoginPage() {
+function LoginFormContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState('');
   const { login, isLoading } = useAuthStore();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams?.get('redirect') || '/';
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -32,7 +34,7 @@ export default function LoginPage() {
     try {
       await login(data.email, data.password);
       toast.success('Welcome back!');
-      router.push('/');
+      router.push(redirect);
     } catch (error: any) {
       setApiError(error?.message || 'Invalid credentials. Please try again.');
     }
@@ -115,11 +117,19 @@ export default function LoginPage() {
 
         <p className="text-center text-gray-500 text-sm mt-6">
           Don't have an account?{' '}
-          <Link href="/register" className="text-blue-600 font-medium hover:text-blue-700">
+          <Link href={`/register${redirect !== '/' ? `?redirect=${encodeURIComponent(redirect)}` : ''}`} className="text-blue-600 font-medium hover:text-blue-700">
             Create account
           </Link>
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50" />}>
+      <LoginFormContent />
+    </Suspense>
   );
 }
