@@ -1,12 +1,15 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { ProductCard } from '@/components/product/product-card';
 import { productsApi, bannersApi } from '@/services/api';
-import { ArrowRight, ChevronRight, Truck, RefreshCw, Shield } from 'lucide-react';
+import { PosterModal } from '@/components/banner/poster-modal';
+import { ArrowRight, ChevronRight, Truck, RefreshCw, Shield, Sparkles, Eye } from 'lucide-react';
 
 export default function HomePage() {
   const { data: trendingData } = useQuery({
@@ -33,6 +36,27 @@ export default function HomePage() {
   const newArrivals: any[] = (newArrivalsData as any)?.data || [];
   const allProducts: any[] = (allProductsData as any)?.data || [];
   const activeBanners: any[] = ((bannersData as any)?.data || []).filter((b: any) => b.isActive);
+
+  const [isPosterOpen, setIsPosterOpen] = useState(false);
+  const [isAutoClosing, setIsAutoClosing] = useState(true);
+
+  // Auto-open poster modal for ~10 seconds on first load when active poster exists
+  useEffect(() => {
+    if (activeBanners.length > 0) {
+      const bannerKey = `has_seen_poster_${activeBanners.map((b) => b.id).join('_')}`;
+      const alreadySeen = sessionStorage.getItem(bannerKey);
+      if (!alreadySeen) {
+        setIsPosterOpen(true);
+        setIsAutoClosing(true);
+        sessionStorage.setItem(bannerKey, 'true');
+      }
+    }
+  }, [activeBanners]);
+
+  const handleOpenManualPoster = () => {
+    setIsAutoClosing(false);
+    setIsPosterOpen(true);
+  };
 
   const categories = [
     { name: 'Women', slug: 'women' },
@@ -80,6 +104,30 @@ export default function HomePage() {
               </div>
             </div>
           </section>
+        )}
+
+        {/* Poster Re-view Option Bar */}
+        {activeBanners.length > 0 && (
+          <div className="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 border-b border-amber-200/70 py-2.5 px-4">
+            <div className="container mx-auto flex items-center justify-between flex-wrap gap-2 text-xs sm:text-sm">
+              <div className="flex items-center gap-2">
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                </span>
+                <span className="font-semibold text-gray-900">
+                  {activeBanners[0]?.title ? `📢 ${activeBanners[0].title}` : 'Special Offer Poster Available'}
+                </span>
+              </div>
+              <button
+                onClick={handleOpenManualPoster}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-black text-white font-medium rounded-full hover:bg-gray-800 transition-all shadow-xs cursor-pointer active:scale-95"
+              >
+                <Eye className="h-3.5 w-3.5 text-amber-400" />
+                <span>View Poster</span>
+              </button>
+            </div>
+          </div>
         )}
 
 
@@ -201,6 +249,31 @@ export default function HomePage() {
           </div>
         </section>
       </main>
+
+      {/* Floating Poster View Option Button */}
+      {activeBanners.length > 0 && (
+        <motion.button
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={handleOpenManualPoster}
+          className="fixed bottom-20 left-4 sm:bottom-6 sm:left-6 z-40 bg-black/95 text-white px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full shadow-2xl flex items-center gap-2 text-xs sm:text-sm font-semibold border border-white/20 backdrop-blur-md hover:bg-black transition-all cursor-pointer group"
+          title="View Active Poster"
+        >
+          <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+          <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-400 group-hover:rotate-12 transition-transform" />
+          <span>View Poster</span>
+        </motion.button>
+      )}
+
+      {/* Poster Pop-up Modal */}
+      <PosterModal
+        isOpen={isPosterOpen}
+        onClose={() => setIsPosterOpen(false)}
+        banners={activeBanners}
+        isAutoClosing={isAutoClosing}
+      />
 
       <Footer />
     </div>
