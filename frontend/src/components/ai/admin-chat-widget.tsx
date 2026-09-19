@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, RotateCcw, Bot, User, Zap, ChevronDown } from 'lucide-react';
+import { X, Send, RotateCcw, Bot, User, Zap } from 'lucide-react';
 import { aiApi } from '@/services/api';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -98,6 +98,20 @@ export function AdminChatWidget() {
 
   return (
     <>
+      {/* Mobile Backdrop */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsOpen(false)}
+            className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40 sm:hidden"
+            aria-hidden="true"
+          />
+        )}
+      </AnimatePresence>
+
       {/* Chat Window */}
       <AnimatePresence>
         {isOpen && (
@@ -106,7 +120,7 @@ export function AdminChatWidget() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            className="fixed bottom-24 right-4 md:right-6 z-50 w-[calc(100vw-2rem)] max-w-[400px]"
+            className="fixed bottom-4 sm:bottom-6 right-2 sm:right-4 md:right-6 z-50 w-[calc(100vw-1rem)] sm:w-[calc(100vw-2rem)] max-w-[400px]"
           >
             <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-200">
               {/* Header */}
@@ -225,28 +239,26 @@ export function AdminChatWidget() {
         )}
       </AnimatePresence>
 
-      {/* Floating Button */}
-      <motion.button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-4 md:right-6 z-50 w-14 h-14 rounded-2xl bg-gray-900 text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center"
-        whileHover={{ scale: 1.08 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        <AnimatePresence mode="wait">
-          {isOpen ? (
-            <motion.div key="close" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }}>
-              <ChevronDown className="h-6 w-6" />
-            </motion.div>
-          ) : (
-            <motion.div key="chat" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
-              <Zap className="h-6 w-6 text-yellow-400" />
-            </motion.div>
-          )}
-        </AnimatePresence>
+      {/* Floating Button (shown only when chat is closed to avoid any overlap) */}
+      <AnimatePresence>
         {!isOpen && (
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse" />
+          <motion.button
+            key="admin-chat-floating-btn"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setIsOpen(true)}
+            className="fixed bottom-6 right-4 md:right-6 z-50 w-14 h-14 rounded-2xl bg-gray-900 text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center cursor-pointer active:scale-95"
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.95 }}
+            aria-label="Open Admin AI Assistant"
+          >
+            <Zap className="h-6 w-6 text-yellow-400" />
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse" />
+          </motion.button>
         )}
-      </motion.button>
+      </AnimatePresence>
     </>
   );
 }

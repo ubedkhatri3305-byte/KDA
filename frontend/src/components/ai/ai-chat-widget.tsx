@@ -148,6 +148,20 @@ export function AiChatWidget() {
 
   return (
     <>
+      {/* Mobile Backdrop */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsOpen(false)}
+            className="fixed inset-0 bg-black/40 z-40 md:hidden backdrop-blur-xs"
+            aria-hidden="true"
+          />
+        )}
+      </AnimatePresence>
+
       {/* Chat Window */}
       <AnimatePresence>
         {isOpen && (
@@ -156,9 +170,9 @@ export function AiChatWidget() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            className="fixed bottom-20 md:bottom-24 right-2 sm:right-4 md:right-6 z-50 w-[calc(100vw-1rem)] sm:w-[calc(100vw-2rem)] max-w-[400px]"
+            className="fixed bottom-[72px] sm:bottom-20 md:bottom-24 right-2 sm:right-4 md:right-6 z-50 w-[calc(100vw-1rem)] sm:w-[calc(100vw-2rem)] max-w-[420px]"
           >
-            <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col max-h-[calc(100vh-6rem)] md:max-h-[85vh]">
+            <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col max-h-[calc(100vh-6.5rem)] md:max-h-[85vh]">
               {/* Header */}
               <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-4 flex-shrink-0">
                 <div className="flex items-center justify-between">
@@ -174,12 +188,24 @@ export function AiChatWidget() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button onClick={resetChat} className="p-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition-all text-white" title="Reset chat">
-                      <RotateCcw className="h-3.5 w-3.5" />
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={resetChat}
+                      className="p-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition-all text-white cursor-pointer active:scale-95"
+                      title="Reset chat"
+                      aria-label="Reset chat"
+                    >
+                      <RotateCcw className="h-4 w-4" />
                     </button>
-                    <button onClick={() => setIsOpen(false)} className="p-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition-all text-white">
-                      <X className="h-3.5 w-3.5" />
+                    <button
+                      type="button"
+                      onClick={() => setIsOpen(false)}
+                      className="p-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition-all text-white cursor-pointer active:scale-95"
+                      title="Close chat"
+                      aria-label="Close chat"
+                    >
+                      <X className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
@@ -343,7 +369,7 @@ export function AiChatWidget() {
                     <button
                       key={reply}
                       onClick={() => sendMessage(reply)}
-                      className="text-[11px] px-2.5 py-1 rounded-full bg-white border border-purple-200 text-purple-600 hover:bg-purple-50 transition-all font-medium"
+                      className="text-[11px] px-2.5 py-1 rounded-full bg-white border border-purple-200 text-purple-600 hover:bg-purple-50 transition-all font-medium cursor-pointer"
                     >
                       {reply}
                     </button>
@@ -352,22 +378,24 @@ export function AiChatWidget() {
               )}
 
               {/* Input */}
-              <form onSubmit={handleSubmit} className="flex gap-2 p-3 border-t border-gray-100 bg-white flex-shrink-0">
+              <form onSubmit={handleSubmit} className="flex items-center gap-2 p-3 border-t border-gray-100 bg-white flex-shrink-0">
                 <input
                   ref={inputRef}
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask or search: 'red saree', 'white kurti'..."
-                  className="flex-1 px-3.5 py-2 rounded-xl border border-gray-200 text-xs focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-400 bg-gray-50"
+                  className="flex-1 px-3.5 py-2.5 rounded-xl border border-gray-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-400 bg-gray-50"
                   disabled={isLoading}
                 />
                 <button
                   type="submit"
                   disabled={!input.trim() || isLoading}
-                  className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 text-white"
+                  className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0 text-white cursor-pointer shadow-md shadow-purple-500/20 active:scale-95"
+                  title="Send message"
+                  aria-label="Send message"
                 >
-                  <Send className="h-3.5 w-3.5" />
+                  <Send className="h-4 w-4" />
                 </button>
               </form>
             </div>
@@ -375,29 +403,26 @@ export function AiChatWidget() {
         )}
       </AnimatePresence>
 
-      {/* Floating Button */}
-      <motion.button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        aria-label="Toggle AI Stylist Chat"
-      >
-        <AnimatePresence mode="wait">
-          {isOpen ? (
-            <motion.div key="close" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }}>
-              <X className="h-6 w-6" />
-            </motion.div>
-          ) : (
-            <motion.div key="chat" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
-              <MessageCircle className="h-6 w-6" />
-            </motion.div>
-          )}
-        </AnimatePresence>
+      {/* Floating Button (shown only when chat is closed to avoid any overlap) */}
+      <AnimatePresence>
         {!isOpen && (
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse" />
+          <motion.button
+            key="ai-chat-floating-button"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setIsOpen(true)}
+            className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center cursor-pointer active:scale-95"
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.95 }}
+            aria-label="Open AI Stylist Chat"
+          >
+            <MessageCircle className="h-6 w-6" />
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse" />
+          </motion.button>
         )}
-      </motion.button>
+      </AnimatePresence>
     </>
   );
 }
