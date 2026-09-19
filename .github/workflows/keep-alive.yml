@@ -1,0 +1,26 @@
+name: Keep Render Backend Warm
+
+on:
+  schedule:
+    # Ping every 10 minutes (Render sleeps after 15 minutes of inactivity)
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render Backend Health Endpoint
+        run: |
+          echo "Pinging Render backend health check..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -m 30 https://kda-km8t.onrender.com/health || echo "FAILED")
+          echo "Render Backend Response Code: $HTTP_STATUS"
+
+      - name: Ping Next.js KeepAlive Endpoint
+        run: |
+          echo "Pinging Vercel Next.js keepalive endpoint..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -m 30 https://kda-two.vercel.app/api/keepalive || echo "FAILED")
+          echo "Vercel Next.js Response Code: $HTTP_STATUS"

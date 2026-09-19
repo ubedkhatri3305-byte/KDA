@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Body, Param, Query, UseGuards, Patch, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, Query, UseGuards, Patch, UseInterceptors, UploadedFile, Header } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
@@ -15,6 +15,7 @@ export class BannersController {
 
   @Public()
   @Get()
+  @Header('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400')
   @ApiOperation({ summary: 'Get all banners' })
   findAll(@Query('position') position?: string) {
     return this.bannersService.findAll(position);

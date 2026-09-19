@@ -12,6 +12,7 @@ import {
   UseInterceptors,
   UploadedFiles,
   ParseIntPipe,
+  Header,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import {
@@ -38,6 +39,7 @@ export class ProductsController {
   // ─── Public Routes ─────────────────────────────────────────
   @Public()
   @Get()
+  @Header('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400')
   @ApiOperation({
     summary: 'Get all products with filtering, sorting, pagination',
   })
@@ -47,6 +49,7 @@ export class ProductsController {
 
   @Public()
   @Get('featured')
+  @Header('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400')
   @ApiOperation({ summary: 'Get featured products' })
   getFeatured() {
     return this.productsService.getFeatured();
@@ -54,6 +57,7 @@ export class ProductsController {
 
   @Public()
   @Get('trending')
+  @Header('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400')
   @ApiOperation({ summary: 'Get trending products' })
   getTrending() {
     return this.productsService.getTrending();
@@ -61,6 +65,7 @@ export class ProductsController {
 
   @Public()
   @Get('new-arrivals')
+  @Header('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400')
   @ApiOperation({ summary: 'Get new arrival products' })
   getNewArrivals() {
     return this.productsService.getNewArrivals();
@@ -76,6 +81,7 @@ export class ProductsController {
 
   @Public()
   @Get(':slug')
+  @Header('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400')
   @ApiOperation({ summary: 'Get product by slug' })
   findOne(@Param('slug') slug: string, @CurrentUser() user: any) {
     return this.productsService.findBySlug(slug, user?.id);

@@ -10,6 +10,7 @@ import { ProductCard } from '@/components/product/product-card';
 import { productsApi, bannersApi } from '@/services/api';
 import { PosterModal } from '@/components/banner/poster-modal';
 import { ArrowRight, ChevronRight, Truck, RefreshCw, Shield, Sparkles, Eye } from 'lucide-react';
+import { INITIAL_TRENDING_PRODUCTS, INITIAL_NEW_ARRIVALS } from '@/lib/initial-catalog';
 
 export default function HomePage() {
   const { data: trendingData } = useQuery({
@@ -32,8 +33,16 @@ export default function HomePage() {
     queryFn: () => productsApi.getAll({ limit: 12 }),
   });
 
-  const trending: any[] = (trendingData as any)?.data || [];
-  const newArrivals: any[] = (newArrivalsData as any)?.data || [];
+  const trending: any[] =
+    (trendingData as any)?.data && (trendingData as any).data.length > 0
+      ? (trendingData as any).data
+      : INITIAL_TRENDING_PRODUCTS;
+
+  const newArrivals: any[] =
+    (newArrivalsData as any)?.data && (newArrivalsData as any).data.length > 0
+      ? (newArrivalsData as any).data
+      : INITIAL_NEW_ARRIVALS;
+
   const allProducts: any[] = (allProductsData as any)?.data || [];
   const activeBanners: any[] = ((bannersData as any)?.data || []).filter((b: any) => b.isActive);
 

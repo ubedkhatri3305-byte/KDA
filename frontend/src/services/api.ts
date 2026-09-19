@@ -47,17 +47,9 @@ export const getBaseUrl = (): string => {
       return `http://${host}:5000/api/v1`;
     }
 
-    // Production / Vercel deployment: use configured API URL if valid
-    if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
-      let resolved = sanitizeApiUrl(envUrl);
-      if (window.location.protocol === 'https:' && resolved.startsWith('http://')) {
-        resolved = resolved.replace(/^http:\/\//i, 'https://');
-      }
-      return resolved;
-    }
-
-    // Direct live backend on Render
-    return DEFAULT_PRODUCTION_API_URL;
+    // Deployed environment (Vercel / Production domain):
+    // Use relative /api/v1 to leverage Next.js Edge proxy and Vercel CDN caching without CORS overhead
+    return '/api/v1';
   }
 
   // 2. Server-side / build fallback
@@ -69,6 +61,15 @@ export const getBaseUrl = (): string => {
   }
   return envUrl || 'http://localhost:5000/api/v1';
 };
+
+// Fire-and-forget background ping to keep Render warm or wake it early
+if (typeof window !== 'undefined') {
+  try {
+    setTimeout(() => {
+      fetch('/api/keepalive', { priority: 'low' } as any).catch(() => {});
+    }, 100);
+  } catch {}
+}
 
 export const apiClient = axios.create({
   baseURL: getBaseUrl(),

@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CacheModule } from '@nestjs/cache-manager';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
@@ -50,11 +51,18 @@ import { AppService } from './app.service';
       envFilePath: ['.env', '.env.local'],
     }),
 
-    // Rate Limiting
+    // In-memory Cache for fast data responses
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 60 * 1000, // 60 seconds default TTL
+      max: 500, // Max 500 items in cache
+    }),
+
+    // Rate Limiting (Short limit increased to 20 to accommodate parallel product queries on first load)
     ThrottlerModule.forRoot([
-      { name: 'short', ttl: 1000, limit: 3 },
-      { name: 'medium', ttl: 10000, limit: 20 },
-      { name: 'long', ttl: 60000, limit: 100 },
+      { name: 'short', ttl: 1000, limit: 20 },
+      { name: 'medium', ttl: 10000, limit: 50 },
+      { name: 'long', ttl: 60000, limit: 200 },
     ]),
 
     // Scheduling

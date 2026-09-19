@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Header } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CategoriesService } from './categories.service';
 import { Public } from '../../common/decorators/public.decorator';
@@ -10,6 +10,7 @@ export class CategoriesController {
 
   @Public()
   @Get()
+  @Header('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400')
   async findAll() {
     return this.categoriesService.findAll();
   }
