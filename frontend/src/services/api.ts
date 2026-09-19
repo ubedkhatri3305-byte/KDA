@@ -219,7 +219,7 @@ export const bannersApi = {
   getAll: (params?: any) => apiClient.get('/banners', { params }),
   create: (data: any) => apiClient.post('/banners', data),
   delete: (id: string) => apiClient.delete(`/banners/${id}`),
-  toggleActive: (id: string) => apiClient.patch(`/banners/${id}/toggle-active`),
+  toggleActive: (id: string, isActive?: boolean) => apiClient.patch(`/banners/${id}/toggle-active`, { isActive }),
   uploadImage: (formData: FormData) => apiClient.post('/banners/upload', formData),
 };
 

@@ -1,20 +1,62 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { bannersApi } from '@/services/api';
+import { useAuthStore } from '@/store/auth.store';
 import { toast } from 'sonner';
-import { Sparkles, Trash2, Plus, Image as ImageIcon, ArrowLeft } from 'lucide-react';
+import { Sparkles, Trash2, Plus, Image as ImageIcon, ArrowLeft, Loader2 } from 'lucide-react';
+
+function ToggleSwitch({
+  isOn,
+  onChange,
+  disabled,
+}: {
+  isOn: boolean;
+  onChange: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onChange}
+      disabled={disabled}
+      title={isOn ? 'Click to deactivate banner' : 'Click to activate banner'}
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+        isOn ? 'bg-green-500' : 'bg-gray-300'
+      }`}
+    >
+      <span
+        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-300 ${
+          isOn ? 'translate-x-6' : 'translate-x-1'
+        }`}
+      />
+    </button>
+  );
+}
 
 export default function AdminBannersPage() {
   const queryClient = useQueryClient();
+  const router = useRouter();
+  const { user, isAuthenticated } = useAuthStore();
   const [isAdding, setIsAdding] = useState(false);
   const [formData, setFormData] = useState({ title: '', subtitle: '', imageUrl: '', linkUrl: '' });
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        toast.error('Please log in as an admin to manage banners');
+        router.push('/login?redirect=/admin/banners');
+      }
+    }
+  }, [router]);
+
   const { data: bannersData, isLoading } = useQuery({
     queryKey: ['admin', 'banners'],
-    queryFn: () => bannersApi.getAll({ position: 'home' }),
+    queryFn: () => bannersApi.getAll({ position: 'home', isAdmin: true, _t: Date.now() }),
   });
 
   const createMutation = useMutation({
@@ -22,10 +64,14 @@ export default function AdminBannersPage() {
     onSuccess: () => {
       toast.success('Banner added successfully');
       queryClient.invalidateQueries({ queryKey: ['admin', 'banners'] });
+      queryClient.invalidateQueries({ queryKey: ['banners'] });
+      try { localStorage.removeItem('kda_catalog_cache_v1'); } catch {}
       setIsAdding(false);
       setFormData({ title: '', subtitle: '', imageUrl: '', linkUrl: '' });
     },
-    onError: () => toast.error('Failed to add banner'),
+    onError: (err: any) => {
+      toast.error('Failed to add banner: ' + (err?.response?.data?.message || err?.message || 'Server error'));
+    },
   });
 
   const deleteMutation = useMutation({
@@ -33,14 +79,45 @@ export default function AdminBannersPage() {
     onSuccess: () => {
       toast.success('Banner deleted');
       queryClient.invalidateQueries({ queryKey: ['admin', 'banners'] });
+      queryClient.invalidateQueries({ queryKey: ['banners'] });
+      try { localStorage.removeItem('kda_catalog_cache_v1'); } catch {}
     },
-    onError: () => toast.error('Failed to delete banner'),
+    onError: (err: any) => {
+      toast.error('Failed to delete banner: ' + (err?.response?.data?.message || err?.message || 'Server error'));
+    },
   });
 
   const toggleMutation = useMutation({
-    mutationFn: (id: string) => bannersApi.toggleActive(id),
-    onSuccess: () => {
+    mutationFn: ({ id, nextState }: { id: string; nextState: boolean }) =>
+      bannersApi.toggleActive(id, nextState),
+    onMutate: async ({ id, nextState }) => {
+      await queryClient.cancelQueries({ queryKey: ['admin', 'banners'] });
+      const previousData = queryClient.getQueryData(['admin', 'banners']);
+
+      queryClient.setQueryData(['admin', 'banners'], (old: any) => {
+        if (!old?.data) return old;
+        return {
+          ...old,
+          data: old.data.map((b: any) =>
+            b.id === id ? { ...b, isActive: nextState } : b,
+          ),
+        };
+      });
+
+      return { previousData };
+    },
+    onError: (err: any, variables, context) => {
+      if (context?.previousData) {
+        queryClient.setQueryData(['admin', 'banners'], context.previousData);
+      }
+      const msg = err?.response?.data?.message || err?.message || 'Failed to update banner status';
+      toast.error('Failed to update status: ' + msg);
+    },
+    onSuccess: (_, { nextState }) => {
+      toast.success(nextState ? 'Banner activated (visible on homepage)' : 'Banner deactivated (hidden from homepage)');
       queryClient.invalidateQueries({ queryKey: ['admin', 'banners'] });
+      queryClient.invalidateQueries({ queryKey: ['banners'] });
+      try { localStorage.removeItem('kda_catalog_cache_v1'); } catch {}
     },
   });
 
@@ -186,22 +263,40 @@ export default function AdminBannersPage() {
                     <h3 className="font-bold text-gray-900">{banner.title}</h3>
                     {banner.subtitle && <p className="text-sm text-gray-500 mt-1">{banner.subtitle}</p>}
                     <div className="mt-auto pt-4 flex items-center justify-between border-t border-gray-100">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={banner.isActive}
-                          onChange={() => toggleMutation.mutate(banner.id)}
-                          className="rounded text-black focus:ring-black cursor-pointer"
+                      <div className="flex items-center gap-2.5">
+                        <ToggleSwitch
+                          isOn={Boolean(banner.isActive)}
+                          disabled={
+                            toggleMutation.isPending &&
+                            (toggleMutation.variables as any)?.id === banner.id
+                          }
+                          onChange={() =>
+                            toggleMutation.mutate({
+                              id: banner.id,
+                              nextState: !banner.isActive,
+                            })
+                          }
                         />
-                        <span className="text-sm font-medium text-gray-700">Active</span>
-                      </label>
+                        <span
+                          className={`text-xs font-semibold px-2.5 py-0.5 rounded-full transition-colors ${
+                            banner.isActive
+                              ? 'bg-green-100 text-green-700 border border-green-200'
+                              : 'bg-gray-100 text-gray-500 border border-gray-200'
+                          }`}
+                        >
+                          {banner.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </div>
                       <button
+                        type="button"
                         onClick={() => {
                           if (confirm('Are you sure you want to delete this banner?')) {
                             deleteMutation.mutate(banner.id);
                           }
                         }}
-                        className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        disabled={deleteMutation.isPending}
+                        className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                        title="Delete banner"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>

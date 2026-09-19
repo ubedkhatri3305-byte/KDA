@@ -21,12 +21,39 @@ function getTargetBaseUrl(): string {
 }
 
 // Determines if this path is a public catalog query that benefits from Vercel Edge caching
-function isCacheableCatalogGet(pathStr: string, method: string): boolean {
+function isCacheableCatalogGet(
+  pathStr: string,
+  method: string,
+  reqHeaders: Headers,
+  search: string,
+): boolean {
   if (method !== 'GET') return false;
+
+  // Never cache requests that include Authorization headers (e.g. Admin requests)
+  const auth = reqHeaders.get('authorization');
+  if (auth && auth.length > 0) return false;
+
+  // Never cache admin queries or cache-busted requests
+  if (
+    search.includes('isAdmin') ||
+    search.includes('_t=') ||
+    search.includes('admin=') ||
+    pathStr.includes('/admin/')
+  ) {
+    return false;
+  }
+
+  // Never cache if Client explicitly asks for no-cache
+  const cc = reqHeaders.get('cache-control') || '';
+  if (cc.includes('no-cache') || cc.includes('no-store')) return false;
+
   return (
-    pathStr.startsWith('products') ||
-    pathStr.startsWith('banners') ||
-    pathStr.startsWith('categories')
+    pathStr === 'products' ||
+    pathStr.startsWith('products/trending') ||
+    pathStr.startsWith('products/new-arrivals') ||
+    pathStr.startsWith('products/featured') ||
+    pathStr === 'banners' ||
+    pathStr === 'categories'
   );
 }
 
@@ -38,7 +65,6 @@ async function handleProxy(req: NextRequest, { params }: { params: Promise<{ pat
   const targetUrl = `${targetBase}/${pathStr}${search}`;
 
   const method = req.method;
-  const isCacheable = isCacheableCatalogGet(pathStr, method);
 
   // Copy necessary request headers
   const reqHeaders = new Headers();
@@ -49,19 +75,27 @@ async function handleProxy(req: NextRequest, { params }: { params: Promise<{ pat
     }
   });
 
+  const isCacheable = isCacheableCatalogGet(pathStr, method, reqHeaders, search);
+
   const fetchOptions: RequestInit = {
     method,
     headers: reqHeaders,
   };
 
-  // Add body for non-GET/HEAD methods
+  // Add body for non-GET/HEAD methods if content exists
   if (method !== 'GET' && method !== 'HEAD') {
     try {
       const contentType = req.headers.get('content-type') || '';
       if (contentType.includes('application/json') || contentType.includes('text/')) {
-        fetchOptions.body = await req.text();
+        const text = await req.text();
+        if (text && text.length > 0) {
+          fetchOptions.body = text;
+        }
       } else {
-        fetchOptions.body = await req.arrayBuffer();
+        const buf = await req.arrayBuffer();
+        if (buf && buf.byteLength > 0) {
+          fetchOptions.body = buf;
+        }
       }
     } catch {
       // Body may be empty or already consumed
@@ -102,6 +136,8 @@ async function handleProxy(req: NextRequest, { params }: { params: Promise<{ pat
         'public, s-maxage=300, stale-while-revalidate=86400',
       );
       responseHeaders.set('X-Edge-Cache-Status', 'CONFIGURED');
+    } else {
+      responseHeaders.set('Cache-Control', 'no-store, no-cache, must-revalidate');
     }
 
     return new NextResponse(resData, {

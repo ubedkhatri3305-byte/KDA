@@ -38,12 +38,13 @@ export class BannersService {
     return this.prisma.banner.delete({ where: { id } });
   }
 
-  async toggleActive(id: string) {
+  async toggleActive(id: string, targetState?: boolean) {
     const banner = await this.prisma.banner.findUnique({ where: { id } });
     if (!banner) throw new NotFoundException('Banner not found');
+    const newActive = targetState !== undefined ? Boolean(targetState) : !banner.isActive;
     return this.prisma.banner.update({
       where: { id },
-      data: { isActive: !banner.isActive },
+      data: { isActive: newActive },
     });
   }
 

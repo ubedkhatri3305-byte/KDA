@@ -1,4 +1,19 @@
-import { Controller, Get, Post, Delete, Body, Param, Query, UseGuards, Patch, UseInterceptors, UploadedFile, Header } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  Patch,
+  UseInterceptors,
+  UploadedFile,
+  Req,
+  Res,
+} from '@nestjs/common';
+import type { Response, Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
@@ -15,9 +30,18 @@ export class BannersController {
 
   @Public()
   @Get()
-  @Header('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400')
   @ApiOperation({ summary: 'Get all banners' })
-  findAll(@Query('position') position?: string) {
+  findAll(
+    @Query('position') position?: string,
+    @Res({ passthrough: true }) res?: Response,
+    @Req() req?: Request,
+  ) {
+    const isAuth = req?.headers?.authorization || req?.query?.isAdmin;
+    if (!isAuth) {
+      res?.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400');
+    } else {
+      res?.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    }
     return this.bannersService.findAll(position);
   }
 
@@ -55,7 +79,10 @@ export class BannersController {
   @Roles(Role.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Toggle banner active status (Admin)' })
-  toggleActive(@Param('id') id: string) {
-    return this.bannersService.toggleActive(id);
+  toggleActive(
+    @Param('id') id: string,
+    @Body('isActive') isActive?: boolean,
+  ) {
+    return this.bannersService.toggleActive(id, isActive);
   }
 }
